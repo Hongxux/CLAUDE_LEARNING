@@ -1,0 +1,17 @@
+{
+  "_comment": "Archived learning state for 分层架构风格",
+  "hooks_progress": {
+    "功能需求": "completed",
+    "核心痛点": "completed",
+    "核心价值": "completed",
+    "价值衡量": "skipped",
+    "适用边界": "skipped",
+    "核心逻辑": "skipped",
+    "底层机制": "skipped",
+    "风险问题": "skipped",
+    "缓解措施": "skipped"
+  },
+  "concepts_progress": {
+    "分层架构风格": "partial"
+  }
+}

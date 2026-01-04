@@ -1,0 +1,11 @@
+{
+  "_comment": "Archived learning state for SOA_RESTful",
+  "hooks_progress": {
+    "功能需求": "completed",
+    "核心痛点": "completed"
+  },
+  "concepts_progress": {
+    "SOA": "partial",
+    "RESTful": "partial"
+  }
+}

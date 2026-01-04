@@ -1,0 +1,71 @@
+{
+  "_comment": "Teaching methods and correctness rules. Reflections are extracted to quick_reference/correctness_rules/methods then deleted.",
+  
+  "methods": {
+    "explanation_structure": {
+      "core_L1": {
+        "parts": ["definition", "mechanism", "principle", "tradeoff", "relation", "boundary", "example", "memory"],
+        "depth": "complete_8_parts",
+        "questioning": "L1_to_L5",
+        "target": "deep_understanding_transferable"
+      },
+      "support_L2": {
+        "parts": ["definition", "importance", "factors", "data", "memory"],
+        "depth": "sufficient_only",
+        "questioning": "L1_to_L3",
+        "target": "understand_concept_support_core"
+      },
+      "extension_L3": {
+        "parts": ["definition", "brief"],
+        "depth": "minimal",
+        "questioning": "L1_only",
+        "target": "know_concept_exists"
+      }
+    },
+    "questioning_levels": {
+      "L1_fact": "Definition? Factors?",
+      "L2_causality": "Why? Root cause?",
+      "L3_tradeoff": "Sacrifice? Gain? When worth?",
+      "L4_relation": "How A relates to B? Changes when X increases?",
+      "L5_scenario": "Works in scenario X? How to adapt?"
+    },
+    "verification_flow": {
+      "support": "Teach → Verify L1+L2+L3 (5 questions) → Find gaps → Supplement → Re-verify → Confirm → Record immediately → Next",
+      "core": "Teach → Verify L1-L5 → Find gaps → Supplement → Re-verify → Confirm → Record immediately"
+    },
+    "sufficiency_test": "Does this info directly support core understanding? Yes→Keep, No→Remove",
+    "effectiveness_evaluation": {
+      "dimensions": ["answer_quality", "flow_smoothness", "no_new_reflection", "student_feedback"],
+      "criteria": {
+        "effective": "4✅ or 3✅+1⚠️",
+        "partial": "2✅+2⚠️",
+        "ineffective": "has ❌"
+      }
+    },
+    "reflection_lifecycle": "Record → Extract to quick_reference/correctness_rules/methods → Delete from reflections array"
+  },
+  
+  "correctness_rules": {
+    "language": "English for AI-only content (JSON, internal state), Chinese for MD notes (student reads)",
+    "verification_consistency": "Every support knowledge needs L1+L2+L3 verification (5 questions), don't skip even if concept seems simple",
+    "recording_granularity": "Track sub-question completion in learning-state.json with English keys (e.g., throughput, matching_latency), delete sub-questions when hook question completed",
+    "recording_timing": "Record immediately after each support knowledge verification, don't wait until session end",
+    "workflow": "Student raises issue → Restate understanding → Share doubts → Student confirms → Record to reflections → Extract to rules → Delete reflection → Apply changes",
+    "archive_trigger": "When all hook questions of a document completed, archive to progress/archive/ with hooks_progress and concepts_progress only",
+    "obsidian_format": "Use '- + Tab' indentation for hierarchy (not ####), no tables (convert to text), maintain consistency with existing content format",
+    "hook_question_overlap": "When hook questions overlap (e.g., Q4 performance view, Q5 architecture view), identify unique parts: only teach unique content, reference previous questions for overlaps, verify only unique understanding (3-5 questions for L1+L2+L3)",
+    "hook_question_decomposition": "Always decompose hook question first to identify if support knowledge is needed, don't assume every hook question needs new teaching",
+    "student_insights_recording": "Record student's valuable personal insights (not just verify correctness): 1) Identify insights that are student's own understanding, 2) Reorganize with accurate terminology while preserving core viewpoint, 3) Confirm with student before recording to notes",
+    "teaching_reflection": "When student answers incorrectly/inaccurately or expresses confusion, reflect on teaching method: 1) Missing key concepts? 2) Inappropriate analogy? 3) Wrong explanation order? 4) Need more examples? Record reflection to reflections array"
+  },
+  
+  "quick_reference": {
+    "before_session": ["Read quick_reference + correctness_rules", "Read learning-state.json (current doc only)", "Read review-schedule.json", "Check review due", "Check doubts"],
+    "before_explanation": ["Distinguish core/support/extension", "Support sufficient only", "Pre-embed clues", "Memory aids"],
+    "during_questioning": ["Progressive verification", "Verify L1+L2+L3 after each support (5 questions, keep consistent)", "Judge internally, only output gaps", "Confirm before next"],
+    "after_verification": ["Record immediately to learning document (taught content + key points)", "Update learning-state.json progress (sub-question level, English keys)", "Don't wait until session end"],
+    "when_reflecting": ["Student raises issue", "Restate understanding", "Share doubts", "Student confirms", "Record to reflections", "Extract to rules", "Delete reflection", "Apply changes"]
+  },
+  
+  "reflections": []
+}

@@ -1,0 +1,11 @@
+{
+  "_comment": "Cross-document review schedule (spaced repetition: 1d → 3d → 7d → 14d → 30d)",
+  "发布-订阅架构风格.md": {
+    "钩子问题1_时空解耦实现机制": {"next_review": "2026-01-05", "review_count": 1},
+    "钩子问题2_时空解耦对可扩展性贡献": {"next_review": "2026-01-05", "review_count": 1},
+    "钩子问题3_事件总线性能指标": {"next_review": "2026-01-05", "review_count": 1},
+    "钩子问题4_主题vs内容匹配延迟": {"next_review": "2026-01-05", "review_count": 1},
+    "钩子问题5_主题vs内容匹配本质差异": {"next_review": "2026-01-05", "review_count": 1},
+    "钩子问题6_Linda模板匹配机制": {"next_review": "2026-01-05", "review_count": 1}
+  }
+}
