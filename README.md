@@ -6,114 +6,116 @@ A distributed systems learning environment using hook-based methodology with bui
 
 ## System Design Philosophy
 
-This system is designed to enable AI to **continuously improve its teaching methods** through structured reflection and user feedback, while **optimizing token usage** for efficiency.
+This system is designed to enable AI to **continuously improve its teaching methods** through structured reflection and user feedback, while maintaining **clarity and efficiency**.
 
 ---
 
 ## Core Design Principles
 
-### 1. Token Optimization Strategy
+### 1. Unified Rule System
 
-**Problem**: AI prompts consume excessive tokens, reducing efficiency and increasing costs.
+**Problem**: Scattered rules across multiple files make it hard to maintain consistency.
 
-**Solution**: Separate concerns and load on-demand.
+**Solution**: Single source of truth with layered structure.
 
-#### Architecture
+#### Architecture (Updated 2026-01-05)
 
 ```
-CLAUDE.md (1500 tokens)
-    ├─ Core principles (brief, always loaded)
-    ├─ Key behaviors (bullet points)
-    └─ Reference to teaching-reflections.json
+CLAUDE.md (~2500 tokens, English)
+    ├─ Critical Rules (3 absolute prohibitions)
+    ├─ Core Teaching Workflow (complete flow)
+    ├─ Essential Rules (23 numbered rules by category)
+    ├─ Quick Reference (knowledge depth, verification levels, logical relationships)
+    ├─ Session Protocol (start/during/end)
+    ├─ Rule Evolution History (1-2 lines each, tracks changes)
+    └─ Note Organization Principles (for student notes)
 
-teaching-reflections.json (1500 tokens, English)
-    ├─ methods: Detailed configurations (static, load when needed)
-    ├─ reflections: Problem-improvement records (dynamic, updated frequently)
-    └─ quick_reference: Core principles (always loaded)
-
-learning-state.json (variable)
-    ├─ Learning progress
-    ├─ Review schedule
-    └─ Doubts tracking
+progress/
+    ├─ learning-state.json (current progress)
+    ├─ review-schedule.json (spaced repetition)
+    └─ curriculum.json (hook questions structure)
 ```
+
+**Key Change**: Consolidated teaching-reflections.json into CLAUDE.md for better coherence and easier maintenance.
 
 #### Optimization Techniques
 
-| Technique | Description | Token Savings |
-|-----------|-------------|---------------|
-| **Separation of Concerns** | Core principles in MD, details in JSON | 60-70% |
-| **On-Demand Loading** | Load quick_reference always, methods only when needed | 50-80% |
-| **Language Choice** | English for AI-only content (more compact than Chinese) | 20-30% |
-| **Structured Data** | JSON instead of verbose Markdown | 30-40% |
+| Technique | Description | Benefit |
+|-----------|-------------|---------|
+| **Layered Structure** | Critical rules → Workflow → Details → Reference | Quick access to essentials |
+| **Numbered Rules** | 23 rules organized by category | Easy to reference and discuss |
+| **Concise History** | 1-2 lines per evolution entry | Track changes without bloat |
+| **Recursive Principles** | Apply rules at all levels (e.g., no parallel) | Consistent quality |
 
-**Result**: From 5000 tokens/session → 1000-2500 tokens/session (50-80% savings)
+**Result**: Clear, maintainable, and continuously improving teaching system
 
 ---
 
 ### 2. AI Self-Upgrade Mechanism
 
-**Problem**: AI cannot improve its teaching methods without human intervention.
+**Problem**: AI cannot improve its teaching methods without structured feedback loop.
 
-**Solution**: Built-in reflection loop with structured recording and automatic application.
+**Solution**: Built-in reflection with immediate rule updates.
 
-#### Reflection Loop
+#### Reflection Loop (Updated 2026-01-05)
 
 ```
 Execute teaching
     ↓
-Observe student response
+Student struggles or provides feedback
     ↓
-Detect poor performance (trigger)
+AI: State what to reflect
     ↓
-Analyze root cause
+AI: Share reflection result + improvement proposal
     ↓
-Propose improvement
+Discuss with student (critical: user validates)
     ↓
-Discuss with student (critical: user validates AI's understanding)
+Student confirms or corrects
     ↓
-Record to teaching-reflections.json
+Update Correctness Rule immediately
     ↓
-Apply in next session (read quick_reference at session start)
+Record to Rule Evolution History (1-2 lines, English)
     ↓
-Evaluate effectiveness (4 dimensions)
+Pre-check rules before next teaching (Rule #23)
     ↓
-Update effectiveness field
-    ↓
-Compress: merge similar, refine lessons, delete ineffective
+Apply improvement automatically
 ```
 
-#### Reflection Record Structure
+#### Key Improvements This Session (2026-01-05)
 
-```json
-{
-  "category": "explanation | questioning | ...",
-  "trigger": "What student behavior triggered this reflection",
-  "root_cause": "Why this problem occurred",
-  "improvement": "Specific improvement action",
-  "status": "applied | pending | deprecated",
-  "effectiveness": "effective | partial | ineffective | pending",
-  "lesson": "One-sentence takeaway"
-}
-```
+1. **Reflection Discussion Before Recording** (Rule #19)
+   - AI must discuss reflection with student before recording
+   - Ensures accuracy and agreement
 
-#### Effectiveness Evaluation (4 Dimensions)
+2. **Prohibit Parallel Listing** (Rule #22 - Most Critical)
+   - Eliminate parallel relationships at ALL levels (recursive)
+   - Identify logical relationships: Progressive/Causal/Hierarchical/Temporal/etc.
+   - Example: 总 → 分1 (mechanism) → 分2 (result) is causal chain, not parallel
 
-1. **Answer Quality**: ✅ Accurate & deep / ⚠️ Needs hints / ❌ Cannot answer
-2. **Flow Smoothness**: ✅ Natural flow / ⚠️ Needs re-explanation / ❌ Confused
-3. **No New Reflection**: ✅ Same issue not repeated / ⚠️ Improved / ❌ Repeated
-4. **Student Feedback**: ✅ Explicit understanding / ⚠️ No feedback / ❌ Confused
+3. **Reflection Enforcement Through Pre-Checks** (Rule #23)
+   - Before teaching/recording, internally check all rules
+   - Silent quality control ensures reflections actually take effect
 
-**Criteria**:
-- Effective: 4✅ or 3✅+1⚠️
-- Partial: 2✅+2⚠️
-- Ineffective: has ❌
+4. **Verification Answer Processing** (Rule #7)
+   - Process every answer: supplement jumps → correct errors → add omissions
+   - Reorganize simulating student's thinking
+   - Notes reflect student's corrected voice, not just teaching content
 
-#### Why This Works
+5. **Student-Initiated Questions** (Rule #17)
+   - After answering, ask: "这个解答值得补充到笔记中吗？"
+   - Mark for recording if student confirms
 
-- **Structured Recording**: AI doesn't just "remember", it records in queryable format
-- **Automatic Application**: quick_reference loaded at session start, no manual intervention
-- **Continuous Evaluation**: AI knows if improvements work, can iterate
-- **Compression**: Prevents experience bloat, keeps system efficient
+6. **Bridging Explanation** (Rule #18)
+   - Teacher provides bridging (how support knowledge helps answer hook question)
+   - Not a verification question for student
+
+7. **Immediate Recording** (Rule #20)
+   - Record to notes immediately after each support knowledge
+   - Use `fsAppend` to minimize data loss risk
+
+8. **Transition Between Knowledge** (Rule #21)
+   - Provide 2-3 logical relationship options
+   - Student selects → Add transition sentence to notes
 
 ---
 
@@ -121,38 +123,57 @@ Compress: merge similar, refine lessons, delete ineffective
 
 **Problem**: Systems degrade over time without maintenance mechanisms.
 
-**Solution**: Layered architecture with clear responsibilities and compression mechanisms.
+**Solution**: Layered architecture with clear responsibilities and continuous refinement.
 
-#### Layered Architecture
+#### Layered Architecture (Updated 2026-01-05)
 
 ```
-Layer 1: Core Principles (CLAUDE.md)
-    ├─ Rarely changes
-    ├─ Core teaching philosophy
-    └─ References Layer 2
+Layer 1: Critical Rules (CLAUDE.md top section)
+    ├─ 3 absolute prohibitions
+    ├─ Session start trigger
+    └─ Most important: Rule #22 (no parallel, recursive)
 
-Layer 2: Methods & Reflections (teaching-reflections.json)
-    ├─ methods: Static configurations (teaching methods)
-    ├─ reflections: Dynamic records (problems → improvements)
-    └─ quick_reference: Distilled essence (read every session)
+Layer 2: Core Workflow (CLAUDE.md)
+    ├─ Support Knowledge Teaching (complete flow)
+    ├─ Hook Question Completion
+    └─ Pre-checks before teaching (Rule #23)
 
-Layer 3: Learning State (learning-state.json)
-    ├─ Student progress
-    ├─ Review schedule (spaced repetition)
-    └─ Unresolved doubts
+Layer 3: Essential Rules (CLAUDE.md)
+    ├─ 23 numbered rules by category
+    ├─ Recording & Progress
+    ├─ Verification & Answer Processing
+    ├─ Teaching Quality
+    ├─ Reflection & Improvement
+    └─ Transitions & Structure
+
+Layer 4: Quick Reference (CLAUDE.md)
+    ├─ Knowledge depth (Core/Support/Extension)
+    ├─ Verification levels (L1-L5)
+    ├─ Logical relationships (6 explicit + 7 hidden)
+    └─ Classification dimensions (10 types)
+
+Layer 5: Rule Evolution History (CLAUDE.md)
+    ├─ Tracks why rules changed
+    ├─ 1-2 lines per entry
+    └─ English only for efficiency
+
+Layer 6: Learning State (progress/)
+    ├─ learning-state.json (current progress)
+    ├─ review-schedule.json (spaced repetition)
+    └─ curriculum.json (hook questions)
 ```
 
-#### Compression Mechanisms
+#### Continuous Refinement Mechanisms
 
-**When**: At end of each session
+**When**: During and after each session
 
 **What**:
-1. **Merge Similar**: Combine reflections addressing same root cause
-2. **Refine Lessons**: Extract more precise one-sentence takeaways
-3. **Update Quick Reference**: Distill new principles from reflections
-4. **Delete Ineffective**: Remove reflections marked as ineffective
+1. **Immediate Rule Updates**: When student provides feedback, update rule immediately (Rule #15)
+2. **Pre-Check Enforcement**: Before teaching, check all rules internally (Rule #23)
+3. **Concise History**: Record rule changes in 1-2 lines (Rule Evolution History)
+4. **Recursive Application**: Apply principles at all levels (e.g., Rule #22 no parallel)
 
-**Why**: Prevents experience bloat, keeps system fast and focused
+**Why**: Ensures system improves continuously without bloat
 
 ---
 
@@ -213,40 +234,87 @@ AI records reflection (based on user's correction)
 
 ## Key Innovations
 
-### 1. Progressive Verification
+### 1. Recursive No-Parallel Principle (Rule #22 - Most Critical)
+
+**Traditional**: List multiple items in parallel (hard to remember)
+
+**This System**: 
+- Identify logical relationships at ALL levels (recursive)
+- Use: Progressive/Causal/Categorical/Hierarchical/Temporal/Contrastive
+- Example: 总 → 分1 (mechanism) → 分2 (result) is causal chain
+- Even within "分" items, continue identifying relationships
+
+**Impact**: Every piece of knowledge has clear logical structure, dramatically improves memorability
+
+### 2. Reflection Enforcement Through Pre-Checks (Rule #23)
+
+**Traditional**: Record reflections but forget to apply them
+
+**This System**: 
+- Before teaching/recording, internally check all rules
+- Adjust content if violations found
+- Silent quality control
+
+**Impact**: Reflections actually take effect, system continuously improves
+
+### 3. Progressive Verification with Answer Processing (Rule #7)
 
 **Traditional**: Teach all → Ask questions → Student struggles
 
-**This System**: Teach one → Verify immediately → Find gaps → Supplement → Confirm → Next
+**This System**: 
+- Teach one → Verify immediately (L1-L3, 5 questions)
+- Process each answer: supplement jumps → correct errors → add omissions
+- Reorganize simulating student's thinking
+- Record student's corrected voice to notes
 
-**Impact**: Prevents knowledge gaps from accumulating
+**Impact**: Prevents knowledge gaps, notes reflect authentic understanding
 
-### 2. Layered Explanation
+### 4. Layered Explanation with Concrete Examples (Rule #8)
 
 **Traditional**: Same depth for all knowledge
 
 **This System**: 
-- Core knowledge: 8 parts, deep
-- Support knowledge: 5 parts, sufficient only
-- Extension knowledge: 2 parts, minimal
+- Core knowledge: 8 parts, L1-L5 verification, deep
+- Support knowledge: 5 parts, L1-L3 verification, sufficient only
+- Extension knowledge: 2 parts, L1 verification, minimal
+- Key concepts: name + concrete numerical examples
 
-**Impact**: Student knows what's important, no information overload
+**Impact**: Student knows what's important, no information overload, abstract concepts become concrete
 
-### 3. Pre-embedded Clues
+### 5. Bridging and Transitions (Rules #18, #21)
 
-**Traditional**: Explain concept → Ask deep questions → Student cannot answer (missing info)
+**Traditional**: Teach isolated knowledge points
 
-**This System**: Pre-embed clues for L2-L5 questions in explanation
+**This System**:
+- After verification, teacher provides bridging explanation (how this helps answer hook question)
+- Before next knowledge, identify logical relationship (provide 2-3 options)
+- Student selects → Add transition sentence to notes
 
-**Impact**: Student can answer deep questions because info was provided
+**Impact**: Knowledge forms coherent structure, not isolated facts
 
-### 4. Reflection-Driven Improvement
+### 6. Immediate Recording (Rule #20)
 
-**Traditional**: AI executes fixed instructions, no improvement
+**Traditional**: Record at end of session (risk of data loss)
 
-**This System**: AI reflects on failures, proposes improvements, records, applies
+**This System**: Record immediately after each support knowledge using `fsAppend`
 
-**Impact**: System gets better over time
+**Impact**: Minimizes data loss, enables flexible pause points
+
+### 7. Student-Initiated Questions (Rule #17)
+
+**Traditional**: Answer question → Continue
+
+**This System**: Answer → Ask "这个解答值得补充到笔记中吗？" → Mark for recording
+
+**Impact**: Captures authentic learning moments, student curiosity drives content
+
+### 8. Reflection Discussion Before Recording (Rule #19)
+
+**Traditional**: AI decides what to reflect and records directly
+
+**This System**: State what to reflect → Share result → Discuss → Get confirmation → Record
+
+**Impact**: Ensures reflection accuracy and student agreement
 
 ---
 
@@ -254,65 +322,82 @@ AI records reflection (based on user's correction)
 
 ```
 project/
-├── CLAUDE.md                           # Core principles (1500 tokens, English)
+├── CLAUDE.md                           # Complete teaching system (~2500 tokens, English)
+│                                       # ├─ Critical Rules (3 prohibitions)
+│                                       # ├─ Core Workflow (complete flow)
+│                                       # ├─ Essential Rules (23 numbered)
+│                                       # ├─ Quick Reference (relationships, levels)
+│                                       # ├─ Session Protocol
+│                                       # ├─ Rule Evolution History
+│                                       # └─ Note Organization Principles
 ├── README.md                           # This file (system design documentation)
 ├── progress/
-│   ├── learning-state.json             # Learning progress (English)
-│   └── teaching-reflections.json       # Methods + Reflections (English)
+│   ├── learning-state.json             # Current progress (English)
+│   ├── review-schedule.json            # Spaced repetition schedule
+│   ├── curriculum.json                 # Hook questions structure
+│   ├── concepts/                       # Concept definitions (load on-demand)
+│   │   └── 发布-订阅架构风格.json
+│   └── archive/                        # Completed documents
+│       └── [completed].json
 ├── 发布-订阅架构风格.md                  # Learning document (Chinese, student-facing)
 └── sessions/
-    └── 2026-01-04/
-        └── upgrade-summary.md          # Session-specific improvements
+    └── 2026-01-XX/
+        └── [session-notes].md          # Session-specific notes
 ```
 
 ---
 
-## Token Usage Breakdown
+## Token Usage Breakdown (Updated 2026-01-05)
 
-| Component | Tokens | Frequency | Total/Session |
-|-----------|--------|-----------|---------------|
-| CLAUDE.md | 1500 | Every session | 1500 |
-| quick_reference | 200 | Every session | 200 |
-| methods (when needed) | 1000 | Occasionally | 0-1000 |
-| reflections (when needed) | 500 | Occasionally | 0-500 |
-| learning-state.json | 500 | Every session | 500 |
-| **Total** | | | **2200-3700** |
+| Component | Tokens | Frequency | Notes |
+|-----------|--------|-----------|-------|
+| CLAUDE.md | ~2500 | Every session | Complete teaching system |
+| learning-state.json | ~500 | Every session | Current progress |
+| review-schedule.json | ~300 | Every session | Spaced repetition |
+| curriculum.json | ~400 | Every session | Hook questions |
+| concepts (on-demand) | ~1000 | When teaching | Load only when needed |
+| **Total** | **~3700-4700** | | Depends on concepts loaded |
 
-**Compared to**: Traditional single-file prompt (5000-8000 tokens)
-
-**Savings**: 40-70%
+**Key**: Unified system in CLAUDE.md provides clarity and consistency
 
 ---
 
-## Lessons Learned
+## Lessons Learned (Updated 2026-01-05)
 
-### 1. Token Optimization
+### 1. Teaching Structure
 
-- **Separate concerns**: Don't put everything in one file
-- **Load on-demand**: Not everything needs to be loaded every time
-- **Use English for AI-only content**: More compact than Chinese
-- **Structured data > Prose**: JSON is more token-efficient than Markdown
+- **Eliminate parallel at all levels**: Recursive application of no-parallel principle (Rule #22)
+- **Identify logical relationships**: Progressive/Causal/Hierarchical/Temporal/Categorical/Contrastive
+- **Concrete examples essential**: Abstract concepts need "name + numerical example" (Rule #8)
+- **Process verification answers**: Supplement jumps, correct errors, reorganize (Rule #7)
 
 ### 2. AI Self-Improvement
 
-- **Structured reflection is key**: Free-form "memory" doesn't work, need queryable records
-- **User validation is critical**: AI's analysis may be wrong, user corrects
-- **Automatic application**: If AI has to manually remember, it won't work
-- **Evaluation is essential**: Need to know if improvements work
+- **Discuss before recording**: AI must validate understanding with student (Rule #19)
+- **Pre-check enforcement**: Check rules before teaching, not just record them (Rule #23)
+- **Immediate rule updates**: When student provides feedback, update immediately (Rule #15)
+- **Concise history**: 1-2 lines per evolution entry prevents bloat
 
 ### 3. System Design
 
-- **Layered architecture**: Separate what changes frequently from what doesn't
-- **Compression mechanisms**: Systems accumulate cruft, need active cleanup
-- **Clear responsibilities**: Each file should have one job
-- **Documentation**: Future you (or others) will thank you
+- **Unified source of truth**: Single CLAUDE.md better than scattered files
+- **Layered architecture**: Critical → Workflow → Rules → Reference → History
+- **Numbered rules**: Easy to reference in discussions (e.g., "Rule #22")
+- **Clear responsibilities**: Each section has one purpose
 
 ### 4. User Experience
 
-- **Progressive verification**: Don't let gaps accumulate
-- **Layered explanation**: Adjust depth by importance
-- **Pre-embed clues**: If you'll ask deep questions, provide the info first
-- **User participation**: Let user correct AI's understanding
+- **Bridging explanations**: Teacher explains connections, not ask student (Rule #18)
+- **Transition options**: Provide 2-3 relationship options, student selects (Rule #21)
+- **Immediate recording**: After each support knowledge, not at end (Rule #20)
+- **Student-initiated questions**: Ask if worth recording, capture curiosity (Rule #17)
+
+### 5. Note Quality
+
+- **Student's corrected voice**: Notes reflect student's understanding after processing
+- **Logical structure**: Every knowledge point has clear relationship with others
+- **Obsidian format**: Use indentation, not headers; no tables
+- **Objective statements**: Notes are knowledge, not conversation
 
 ---
 
@@ -321,10 +406,11 @@ project/
 Potential areas for enhancement:
 
 1. **Adaptive Difficulty**: Adjust explanation depth based on student's demonstrated understanding level
-2. **Cross-Session Learning**: Identify patterns across multiple students
-3. **Automated Compression**: Use LLM to compress reflections automatically
-4. **Performance Metrics**: Track token usage, session duration, student satisfaction over time
-5. **Multi-Agent Collaboration**: Share reflections across multiple teaching agents
+2. **Pattern Recognition**: Identify common logical relationships across different topics
+3. **Automated Relationship Detection**: Use LLM to suggest logical relationships between knowledge points
+4. **Performance Metrics**: Track student progress, review effectiveness, rule application frequency
+5. **Multi-Domain Adaptation**: Test system with different subjects (frontend, ML, databases, etc.)
+6. **Collaborative Learning**: Share effective teaching patterns across multiple students
 
 ---
 
@@ -332,11 +418,16 @@ Potential areas for enhancement:
 
 To use this system:
 
-1. Read `CLAUDE.md` to understand core principles
-2. Review `teaching-reflections.json` to see accumulated experience
-3. Start a learning session (AI will read quick_reference automatically)
-4. Provide feedback when AI's teaching isn't working
-5. Watch the system improve over time
+1. Read `CLAUDE.md` to understand the complete teaching system
+2. Review `Rule Evolution History` to see how system improved
+3. Start a learning session with "继续学习"
+4. Provide feedback when teaching isn't working (use "复述理解，分享疑问")
+5. Watch the system improve through your feedback
+
+**Key Commands**:
+- `继续学习`: Continue from current progress
+- `复习`: Review previously learned content
+- `复述理解，分享疑问`: Request AI to clarify understanding before proceeding
 
 ---
 
@@ -459,32 +550,40 @@ Edit `progress/learning-state.json`:
     "[Concept 2]": "not_started"
   },
   "doubts": [],
-  "last_session": "2026-01-04"
+  "last_session": "2026-01-05"
 }
 ```
 
-### Step 4: Customize Teaching Methods (Optional)
+### Step 4: Create Curriculum Structure
 
-Edit `progress/teaching-reflections.json` to adjust:
-
-**Explanation Structure** (`methods.explanation_structure`):
-- Modify parts for core/support/extension knowledge
-- Adjust depth and questioning levels
-
-**Correctness Rules** (`correctness_rules`):
-- Add domain-specific rules
-- Modify verification consistency
-
-**Quick Reference** (`quick_reference`):
-- Add reminders for your specific learning style
-
-### Step 5: Adapt Note Format (Optional)
-
-If you use a different note-taking tool (not Obsidian), update `correctness_rules.obsidian_format`:
+Create `progress/curriculum.json`:
 
 ```json
-"note_format": "Use [YOUR FORMAT RULES]"
+{
+  "documents": {
+    "your-new-document.md": {
+      "completed_hooks": [],
+      "pending_hooks": {
+        "一、[Category 1]": [
+          "1. [Hook question 1]",
+          "2. [Hook question 2]"
+        ]
+      },
+      "concepts_file": "progress/concepts/your-new-document.json"
+    }
+  }
+}
 ```
+
+### Step 5: Customize Teaching Methods (Optional)
+
+The teaching system is now unified in `CLAUDE.md`. To customize:
+
+**Correctness Rules**: Add domain-specific rules to the Essential Rules section
+
+**Logical Relationships**: Add domain-specific relationship types to Quick Reference
+
+**Note Format**: Modify Note Organization Principles if using different tool than Obsidian
 
 ### Example: Customizing for Kubernetes Learning
 
@@ -520,10 +619,12 @@ Interactive tutor for DevOps engineer with Docker experience but no Kubernetes p
 ## Tips for Effective Learning
 
 1. **Be honest about confusion**: When you don't understand, say so. AI will reflect and improve.
-2. **Share your insights**: Your personal understanding is valuable and will be recorded.
+2. **Share your insights**: Your personal understanding is valuable and will be recorded as "个人洞察".
 3. **Use "复述理解，分享疑问"**: This triggers AI to clarify its understanding before proceeding.
-4. **Review regularly**: The spaced repetition system works best when you follow the schedule.
-5. **Provide feedback**: When AI's teaching isn't working, tell it. The system improves through your feedback.
+4. **Point out logical issues**: If knowledge seems parallel or unclear, tell AI. It will reorganize.
+5. **Review regularly**: The spaced repetition system works best when you follow the schedule.
+6. **Provide feedback**: When AI's teaching isn't working, tell it. System improves through your feedback.
+7. **Ask questions during verification**: Your questions reveal curiosity and will be recorded if valuable.
 
 ---
 
@@ -531,11 +632,19 @@ Interactive tutor for DevOps engineer with Docker experience but no Kubernetes p
 
 When you discover new improvements:
 
-1. Discuss with AI during session
-2. AI will record to `teaching-reflections.json`
-3. AI will evaluate effectiveness in next session
-4. If effective, AI will update `quick_reference`
-5. Consider updating this README if it's a system-level improvement
+1. Discuss with AI during session (use "复述理解，分享疑问")
+2. AI will state what to reflect → share result → discuss with you
+3. After confirmation, AI updates Correctness Rule immediately
+4. AI records to Rule Evolution History (1-2 lines)
+5. Improvement applies automatically in next teaching (pre-check)
+6. Consider updating this README if it's a system-level improvement
+
+**Recent Major Improvements** (2026-01-05):
+- Rule #22: Recursive no-parallel principle (most critical)
+- Rule #23: Reflection enforcement through pre-checks
+- Rule #19: Reflection discussion before recording
+- Rule #7: Verification answer processing
+- Rules #17, #18, #20, #21: Student questions, bridging, recording, transitions
 
 ---
 
@@ -549,9 +658,17 @@ This is a learning project. Feel free to adapt for your own use.
 
 This system evolved through iterative improvement during actual teaching sessions. Key insights came from:
 
-- Student feedback on information overload
-- Observing where students struggled
-- Experimenting with different explanation structures
-- Measuring token usage and optimizing
+- Student feedback on parallel listing (hard to remember)
+- Observing where students had logical jumps in answers
+- Experimenting with different logical relationship structures
+- Discovering the need for recursive application of principles
+- Realizing reflections must be enforced through pre-checks
 
-The system is designed to continue evolving through the same process.
+**Major Evolution** (2026-01-05):
+- Consolidated teaching-reflections.json into CLAUDE.md for better coherence
+- Introduced recursive no-parallel principle (Rule #22)
+- Added reflection enforcement through pre-checks (Rule #23)
+- Refined verification answer processing (Rule #7)
+- Enhanced student participation mechanisms (Rules #17, #19)
+
+The system is designed to continue evolving through the same collaborative process.

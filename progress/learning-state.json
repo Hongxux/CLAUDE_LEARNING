@@ -4,27 +4,15 @@
   "hooks_progress": {
     "钩子问题1_时空解耦实现机制": "completed",
     "钩子问题2_时空解耦对可扩展性贡献": "completed",
-    "钩子问题3_事件总线性能指标": {
-      "status": "in_progress",
-      "sub_questions_completed": {
-        "throughput": "completed",
-        "matching_latency": "completed",
-        "peak_load_capacity": "completed",
-        "fault_recovery_speed": "completed"
-      }
-    },
+    "钩子问题3_事件总线性能指标": "completed",
     "钩子问题4_主题vs内容匹配延迟": "completed",
     "钩子问题5_主题vs内容匹配本质差异": "completed",
     "钩子问题6_Linda模板匹配机制": "completed",
-    "钩子问题7_Linda持久化订阅": "not_started",
-    "钩子问题8_中心化匹配瓶颈": "not_started",
-    "钩子问题9_瓶颈对可用性影响": "not_started",
-    "钩子问题10_DHT去中心化": "not_started",
-    "钩子问题11_Gossip协议": "not_started",
-    "钩子问题12_金融场景适配": "not_started",
-    "钩子问题13_PubSub与RPC和MQ对比": "not_started",
-    "钩子问题14_安全与权限控制": "not_started",
-    "钩子问题15_容错保障": "not_started"
+    "钩子问题7_Linda持久化订阅": "completed",
+    "钩子问题8_中心化匹配瓶颈": "completed",
+    "钩子问题9_瓶颈对可用性影响": "completed",
+    "钩子问题10_DHT去中心化": "completed",
+    "钩子问题11_Gossip协议": "in_progress"
   },
   "concepts_progress": {
     "发布-订阅架构风格": "partial",
@@ -33,5 +21,10 @@
     "事件总线": "partial"
   },
   "doubts": [],
-  "last_session": "2026-01-04"
+  "last_session": "2026-01-05",
+  "pending_supplements": [
+    "如何区分Push-Pull混合模式的前期和后期（两种方式）",
+    "Fanout参数k的详细权衡分析",
+    "三种故障类型的详细解释（单点故障、网络分区、节点动态变化）"
+  ]
 }
