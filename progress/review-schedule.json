@@ -11,6 +11,8 @@
     "钩子问题8_中心化匹配瓶颈": {"next_review": "2026-01-08", "review_count": 1, "last_review": "2026-01-05"},
     "钩子问题9_瓶颈对可用性影响": {"next_review": "2026-01-08", "review_count": 1, "last_review": "2026-01-05"},
     "钩子问题10_DHT去中心化": {"next_review": "2026-01-13", "review_count": 2, "last_review": "2026-01-06"},
-    "钩子问题11_Gossip协议": {"next_review": "2026-01-07", "review_count": 1, "last_review": "2026-01-06"}
+    "钩子问题11_Gossip协议": {"next_review": "2026-01-08", "review_count": 2, "last_review": "2026-01-07"},
+    "钩子问题12_金融场景适配": {"next_review": "2026-01-08", "review_count": 1, "last_review": "2026-01-07"},
+    "钩子问题13_通信模式对比": {"next_review": "2026-01-08", "review_count": 1, "last_review": "2026-01-07"}
   }
 }

@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  笔记编写规范 - XML版本
+  用途：指导AI如何编写和组织学习笔记
+-->
+
+<NoteFormatSpec>
+
+  <Purpose>
+    <goal>不是记录，而是重组知识的逻辑结构</goal>
+    <core_requirement>消除并列，显化逻辑关系</core_requirement>
+    <principle>格式服务于逻辑，不是为了美观</principle>
+  </Purpose>
+
+  <!-- ==================== 第一部分：格式规则 ==================== -->
+  <FormatRules required="true">
+
+    <Rule id="list-marker" name="列表标记">
+      <correct>Tab + - + 内容</correct>
+      <correct>Tab + 1. + 内容</correct>
+      <wrong>Tab + 内容（禁止只用Tab不加列表标记）</wrong>
+      <guidance>
+        <when_ordered>有时序/步骤关系的内容 → 使用 1. 2. 3.</when_ordered>
+        <when_unordered>非时序关系的内容 → 使用 -</when_unordered>
+      </guidance>
+    </Rule>
+
+    <Rule id="heading-level" name="小标题">
+      <allowed>###（章节/钩子问题）</allowed>
+      <allowed>####（支撑知识）</allowed>
+      <forbidden>##### 及更深层级</forbidden>
+    </Rule>
+
+    <Rule id="divider" name="分割线">
+      <usage>只在钩子问题之间使用</usage>
+      <format>认知过渡 → --- → 下一个钩子问题/章节</format>
+      <forbidden>在其他地方使用分割线</forbidden>
+    </Rule>
+
+    <Rule id="indentation" name="缩进">
+      <meaning>缩进 = 逻辑从属（下一级是对上一级的展开/支撑/细化）</meaning>
+      <decision_guide>
+        <case relation="展开/细化/支撑">缩进</case>
+        <case relation="并列/同级">同级</case>
+        <case relation="新话题">回到上级或新起一节</case>
+      </decision_guide>
+    </Rule>
+
+    <Rule id="semantic-labels" name="语义化标签">
+      <principle>用标签表达逻辑关系，而非元标签</principle>
+      <correct>原因：、后果：、机制：、效果：、代价：</correct>
+      <wrong>（因果关系）、（递进式串联）</wrong>
+    </Rule>
+
+    <Rule id="other-format" name="其他格式">
+      <forbidden reason="Obsidian表格必须顶格，无法嵌入缩进结构">表格</forbidden>
+      <format name="认知过渡">> **认知过渡**：[内容]（顶格）</format>
+      <format name="认知地图">放在文档开头</format>
+    </Rule>
+
+  </FormatRules>
+
+  <!-- ==================== 第二部分：逻辑组织规则 ==================== -->
+  <LogicRules>
+
+    <Rule id="follow-teaching-plan" name="遵循教案结构">
+      <description>笔记的逻辑组织由教案决定，按照教案中定义的知识结构和逻辑关系组织内容</description>
+    </Rule>
+
+    <Rule id="semantic-labels-for-logic" name="语义化标签体现逻辑关系">
+      <LogicType name="因果">
+        <labels>原因：、后果：、影响：、根源：</labels>
+      </LogicType>
+      <LogicType name="递进">
+        <labels>第一层：、第二层： 或 1.、2.、3.</labels>
+      </LogicType>
+      <LogicType name="对比">
+        <labels>**A特点**：、**B特点**：、**核心差异**：</labels>
+      </LogicType>
+      <LogicType name="总分">
+        <labels>**总**：、**分**：</labels>
+      </LogicType>
+      <LogicType name="方案链条">
+        <labels>机制：、效果：、代价：、缓解：、场景：</labels>
+      </LogicType>
+    </Rule>
+
+    <Rule id="semantic-labels-for-dimension" name="语义化标签体现分类维度">
+      <examples>
+        <label>**性能影响**：</label>
+        <label>**可用性**：</label>
+        <label>**适用场景**：</label>
+        <label>**可接受场景**：、**不可接受场景**：</label>
+      </examples>
+    </Rule>
+
+  </LogicRules>
+
+  <!-- ==================== 第三部分：内容处理规则 ==================== -->
+  <ContentRules>
+
+    <Rule id="info-fusion" name="信息融合">
+      <sources>
+        <source>AI根据教案生成的教学内容</source>
+        <source>学生验证性问题的回答</source>
+      </sources>
+      <principles>
+        <principle>AI教学内容 + 学生回答 = 一个完整知识点</principle>
+        <principle>采用更合理的逻辑组织方式</principle>
+        <principle>不标注来源（不标记"学生理解"或"教师讲解"）</principle>
+      </principles>
+    </Rule>
+
+    <Rule id="supplement-insertion" name="补充知识插入">
+      <description>用户补充的知识需找到逻辑上正确的位置插入，不是简单追加到末尾</description>
+    </Rule>
+
+    <Rule id="info-compression" name="信息压缩">
+      <when_first>完整解释</when_first>
+      <when_subsequent>简要引用或压缩形式</when_subsequent>
+      <example>时间解耦（消息持久化机制）而非重复完整解释</example>
+    </Rule>
+
+    <Rule id="example-placement" name="示例放置">
+      <simple_example>
+        <placement>紧跟概念，同行或子点</placement>
+        <format>- 概念：解释（例如：简单示例）</format>
+      </simple_example>
+      <complex_example>
+        <placement>单独子节，但仍靠近概念</placement>
+      </complex_example>
+    </Rule>
+
+    <Rule id="bold-usage" name="加粗使用">
+      <usage>只加粗定义性核心概念</usage>
+      <format>**[概念名]**：[定义]</format>
+      <forbidden>过度加粗</forbidden>
+    </Rule>
+
+  </ContentRules>
+
+  <!-- ==================== 第四部分：常见问题与检查清单 ==================== -->
+  <CommonIssues>
+    <Issue id="missing-list-marker">
+      <symptom>Tab + 内容</symptom>
+      <solution>改为 Tab + - + 内容</solution>
+    </Issue>
+    <Issue id="heading-too-deep">
+      <symptom>使用 #####</symptom>
+      <solution>改为缩进 + 加粗</solution>
+    </Issue>
+    <Issue id="divider-abuse">
+      <symptom>在非钩子问题处使用分割线</symptom>
+      <solution>删除，只保留钩子问题之间的</solution>
+    </Issue>
+    <Issue id="illogical-indent">
+      <symptom>随意缩进</symptom>
+      <solution>检查是否为"展开/支撑/细化"关系</solution>
+    </Issue>
+    <Issue id="parallel-without-relation">
+      <symptom>简单列出1.2.3.</symptom>
+      <solution>识别逻辑关系或说明分类维度</solution>
+    </Issue>
+    <Issue id="source-annotation">
+      <symptom>标记"学生理解""补充讲解"</symptom>
+      <solution>删除标注，融合为统一知识点</solution>
+    </Issue>
+  </CommonIssues>
+
+  <Checklist>
+    <item>所有缩进行都有列表标记（- 或 1.）</item>
+    <item>小标题只使用 ### 和 ####</item>
+    <item>分割线只在钩子问题之间</item>
+    <item>每层缩进都有逻辑从属关系</item>
+    <item>使用语义化标签而非元标签</item>
+    <item>无来源标注</item>
+    <item>核心概念已加粗</item>
+  </Checklist>
+
+</NoteFormatSpec>
+
+
+  <!-- ==================== 第五部分：参考示例 ==================== -->
+  <Examples optional="true">
+
+    <Example id="hook-question-record" name="钩子问题记录示例">
+      <description>展示如何记录一个钩子问题及其支撑知识</description>
+      <template><![CDATA[
+> **认知过渡**：时空解耦的机制已经明确，但这些机制如何转化为实际的系统价值？
+
+---
+
+### 一、核心定义与价值
+
+- 发布-订阅架构的"时间解耦"与"引用解耦"具体通过哪些机制实现？
+	- **时间解耦的实现机制**：
+		- **总**：实现时间解耦（订阅者离线时消息不丢失）
+		- **核心机制：消息持久化**
+			- 作用：中间件将消息写入磁盘
+			- 解决的问题：订阅者临时下线导致消息丢失
+	- **时序特征是最核心差异**：
+		- **RPC特点**：同步阻塞调用，调用者发起请求后必须等待响应
+			- 性能影响：单次调用耗时65ms，调用者吞吐量仅15次/秒
+		- **消息队列特点**：异步非阻塞调用，发送者发完消息后立即返回
+			- 性能提升：调用者吞吐量90次/秒，提升6倍
+		- **为什么时序特征最重要**：决定了系统的基本性能和可用性特征
+	- 三种通信模式的选择本质上是在"响应速度""耦合程度""扩展性"之间做权衡
+		- RPC：牺牲解耦换取立即响应
+		- 消息队列：牺牲立即响应换取时间解耦
+		- 发布-订阅：进一步牺牲调试便利性换取空间解耦
+]]></template>
+    </Example>
+
+    <Example id="technical-solution-record" name="技术方案记录示例">
+      <description>展示如何记录技术方案的机制链条</description>
+      <template><![CDATA[
+- 如何保证消息不丢失？
+	#### 支撑知识1：消息持久化方案
+	- **机制协同关系**：写入确认（前提）→ 持久化存储（核心）→ 消费确认（保障）
+	- **机制1：写入确认**
+		- 机制：生产者发送消息后等待Broker返回确认
+		- 效果：确保消息已到达Broker
+		- 代价：增加延迟
+		- 缓解：批量发送 + 异步确认
+		- 场景：对可靠性要求高的业务消息
+	- **机制2：持久化存储**
+		- 机制：Broker将消息写入磁盘
+		- 效果：Broker重启后消息不丢失
+		- 代价：写入性能下降
+		- 缓解：顺序写 + 页缓存
+		- 场景：所有需要持久化的消息
+]]></template>
+    </Example>
+
+  </Examples>
+
+</NoteFormatSpec>

@@ -1,0 +1,33 @@
+{
+  "hook_question": "发布-订阅模式与RPC、消息队列在通信模式、节点依赖、适用场景上的核心差异是什么？",
+  "support_knowledge": "三种通信模式的核心机制",
+  "knowledge_type": "概念定义类",
+  "role_in_hook": "在对比之前，需要先理解每种通信模式的核心机制",
+  
+  "structure": {
+    "organization": "按演进关系组织：RPC → 消息队列 → 发布-订阅",
+    "每个模式": {
+      "定义": "一句话",
+      "核心特征": "层次关系：通信模式(技术) → 调用方式(行为) → 耦合程度(架构)",
+      "工作流程": "时序关系：输入→处理→输出→异常"
+    }
+  },
+  
+  "verification_design": {
+    "L1_direction": "发布-订阅与消息队列的核心区别",
+    "L2_direction": "为什么消息分发机制不同导致耦合程度不同",
+    "pre_embed_hints": ["耦合程度取决于调用方需要知道多少信息", "消息分发机制是核心区别"]
+  },
+  
+  "bridging": "理解核心机制后，可以从三个维度系统对比",
+  
+  "transition_to_next": {
+    "next_knowledge": "三种模式的对比分析",
+    "relationship": "递进：先理解机制 → 再对比差异"
+  },
+  
+  "risk_points": [
+    {"risk": "三种模式并列介绍", "prevention": "说明演进关系"},
+    {"risk": "核心特征并列列举", "prevention": "按层次关系组织"}
+  ]
+}

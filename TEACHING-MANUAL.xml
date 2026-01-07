@@ -1,0 +1,669 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  知识结构与教学方法手册 - XML版本
+  用途：创建教案时加载此手册，指导如何组织和讲解不同类型的知识
+-->
+
+<TeachingManual>
+
+  <Purpose>
+    <description>创建教案时加载此手册，指导如何组织和讲解不同类型的知识</description>
+  </Purpose>
+
+  <UsagePrinciples>
+    <principle id="1" name="判断粒度">以支撑知识为单位判断知识类型</principle>
+    <principle id="2" name="灵活应用">结构模板是参考，不是强制；根据实际内容调整</principle>
+    <principle id="3" name="允许扩展">可根据需要新增字段，不局限于模板定义的字段</principle>
+    <principle id="4" name="必选vs可选">每种类型会标注哪些是必须的核心字段，哪些是可选的</principle>
+  </UsagePrinciples>
+
+  <!-- ==================== 第一部分：知识结构分类 ==================== -->
+  <KnowledgeTypes>
+    <instruction>根据知识的性质和教学目标，分为9种类型。每种类型有特定的结构要求。</instruction>
+    <how_to_judge>看这个支撑知识的核心目的是什么——是定义指标？讲解机制？对比方案？还是分析边界？</how_to_judge>
+
+    <!-- 类型1：性能指标类 -->
+    <KnowledgeType id="1" name="性能指标类" english="Performance Metric">
+      <applicable_scenario>讲解可量化的系统指标（如吞吐量、延迟、可用性）</applicable_scenario>
+      
+      <CoreFields required="true">
+        <field name="定义">是什么（单位、计算方式）</field>
+        <field name="影响因素">哪些因素影响它，每个因素需说明影响机制</field>
+        <field name="数据参考">具体数字（来源需可靠）</field>
+      </CoreFields>
+      
+      <ExtendedFields optional="true">
+        <field name="重要性">为什么重要（对系统的影响）</field>
+        <field name="权衡分析">主要/次要权衡 + 缓解方式</field>
+        <field name="优化手段">针对各影响因素的优化方法</field>
+        <field name="记忆串联">类比助记</field>
+      </ExtendedFields>
+      
+      <ClosedLoopCheck>
+        <check>影响因素是否说明了"如何影响"而不只是"是什么"？</check>
+      </ClosedLoopCheck>
+    </KnowledgeType>
+
+    <!-- 类型2：机制/协议类 -->
+    <KnowledgeType id="2" name="机制/协议类" english="Mechanism/Protocol">
+      <applicable_scenario>讲解具体的技术机制或协议（如Gossip协议、一致性哈希）</applicable_scenario>
+      
+      <CoreFields required="true">
+        <field name="定义">是什么 + 核心特点</field>
+        <field name="核心机制" must_form_closed_loop="true">
+          <subfield name="输入">什么触发这个机制？</subfield>
+          <subfield name="处理过程">具体步骤是什么？</subfield>
+          <subfield name="输出/结果">产生什么效果？</subfield>
+          <subfield name="异常处理">边界情况如何处理？</subfield>
+        </field>
+      </CoreFields>
+      
+      <ExtendedFields optional="true">
+        <field name="重要性">解决什么问题（对比传统方案）</field>
+        <field name="关键参数">每个参数的作用、权衡、典型值</field>
+        <field name="代价与缓解">主要/次要代价 + 缓解方式</field>
+        <field name="适用边界">适合/不适合的场景</field>
+        <field name="记忆串联">类比助记</field>
+      </ExtendedFields>
+      
+      <ClosedLoopCheck>
+        <check>机制是否有完整的输入→处理→输出→异常？</check>
+      </ClosedLoopCheck>
+    </KnowledgeType>
+
+    <!-- 类型3：对比分析类 -->
+    <KnowledgeType id="3" name="对比分析类" english="Comparison">
+      <applicable_scenario>对比两个或多个方案/概念的异同</applicable_scenario>
+      
+      <CoreFields required="true">
+        <field name="方案描述" note="每个方案使用统一框架">
+          <subfield name="核心机制">如何工作</subfield>
+          <subfield name="效果">解决什么问题</subfield>
+          <subfield name="代价">牺牲什么</subfield>
+        </field>
+        <field name="对比维度">列出具体的对比维度，各方案在每个维度的表现</field>
+        <field name="选择标准">条件 → 选择哪个方案 → 理由</field>
+      </CoreFields>
+      
+      <ExtendedFields optional="true">
+        <field name="对比目的">为什么要对比</field>
+        <field name="混合策略">如何组合使用多个方案</field>
+      </ExtendedFields>
+      
+      <ClosedLoopCheck>
+        <check>每个方案是否用统一框架描述？</check>
+        <check>选择标准是否明确、可操作？</check>
+      </ClosedLoopCheck>
+    </KnowledgeType>
+
+    <!-- 类型4：应用边界类 -->
+    <KnowledgeType id="4" name="应用边界类" english="Application Boundary">
+      <applicable_scenario>讲解某技术/方案的适用范围和限制</applicable_scenario>
+      
+      <CoreFields required="true">
+        <field name="核心能力">这个技术能做什么</field>
+        <field name="边界">
+          <subfield name="硬边界" type="技术限制，不可突破">限制是什么 + 根本原因</subfield>
+          <subfield name="软边界" type="权衡选择，可调整">限制是什么 + 如何调整</subfield>
+        </field>
+      </CoreFields>
+      
+      <ExtendedFields optional="true">
+        <field name="决策标准">条件 → 是否使用 → 理由</field>
+        <field name="常见误用">误用场景 + 后果 + 正确做法</field>
+        <field name="个人洞察"></field>
+      </ExtendedFields>
+      
+      <ClosedLoopCheck>
+        <check>硬边界和软边界是否区分清楚？</check>
+      </ClosedLoopCheck>
+    </KnowledgeType>
+
+    <!-- 类型5：技术方案类 -->
+    <KnowledgeType id="5" name="技术方案类" english="Technical Solutions">
+      <applicable_scenario>讲解多个技术方案如何解决同一问题</applicable_scenario>
+      
+      <CoreFields required="true">
+        <field name="总">问题描述</field>
+        <field name="分类维度">方案的切入口/设计思路</field>
+        <field name="每个方案">
+          <subfield name="方案名称"></subfield>
+          <subfield name="机制协同关系">说明多个机制如何配合工作（形式不限）</subfield>
+          <subfield name="每个机制的完整链条">
+            <item name="机制">具体做法（需形成闭环）</item>
+            <item name="效果">解决什么问题（多个效果区分主要/次要）</item>
+            <item name="代价">牺牲什么（多个代价区分主要/次要）</item>
+            <item name="缓解方式">如何降低代价（说明从哪个维度缓解）</item>
+            <item name="适用场景">什么时候用</item>
+          </subfield>
+        </field>
+      </CoreFields>
+      
+      <ExtendedFields optional="true">
+        <field name="方案对比">对比维度 + 各方案表现</field>
+        <field name="方案组合">哪些方案可以组合 + 组合效果</field>
+      </ExtendedFields>
+      
+      <ClosedLoopCheck>
+        <check>每个机制是否有完整的效果→代价→缓解链条？</check>
+        <check>缓解方式是否说明了从哪个维度缓解？</check>
+      </ClosedLoopCheck>
+    </KnowledgeType>
+
+    <!-- 类型6：概念定义类 -->
+    <KnowledgeType id="6" name="概念定义类" english="Concept Definition">
+      <applicable_scenario>引入新概念/术语时</applicable_scenario>
+      
+      <CoreFields required="true">
+        <field name="定义">一句话定义</field>
+        <field name="核心特征">区分于其他概念的关键特征</field>
+        <field name="具体示例">用例子说明概念</field>
+      </CoreFields>
+      
+      <ExtendedFields optional="true">
+        <field name="与相关概念的关系">对比/包含/依赖关系</field>
+        <field name="常见误解">误解是什么 + 正确理解</field>
+      </ExtendedFields>
+      
+      <ClosedLoopCheck>
+        <check>定义是否足够精确？</check>
+        <check>与相关概念的边界是否清晰？</check>
+      </ClosedLoopCheck>
+    </KnowledgeType>
+
+    <!-- 类型7：问题诊断类 -->
+    <KnowledgeType id="7" name="问题诊断类" english="Problem Diagnosis">
+      <applicable_scenario>分析问题的根因和解决思路</applicable_scenario>
+      
+      <CoreFields required="true">
+        <field name="问题现象">观察到什么症状</field>
+        <field name="可能原因" note="按可能性排序">描述 + 为什么可能</field>
+        <field name="解决方案">每个原因对应的解决方案</field>
+      </CoreFields>
+      
+      <ExtendedFields optional="true">
+        <field name="诊断方法">如何确认是哪个原因</field>
+        <field name="解决方案的代价和注意事项"></field>
+      </ExtendedFields>
+      
+      <ClosedLoopCheck>
+        <check>每个原因是否有对应的解决方案？</check>
+      </ClosedLoopCheck>
+    </KnowledgeType>
+
+    <!-- 类型8：演进/历史类 -->
+    <KnowledgeType id="8" name="演进/历史类" english="Evolution/History">
+      <applicable_scenario>讲解技术的演进过程</applicable_scenario>
+      
+      <CoreFields required="true">
+        <field name="演进过程" note="递进关系">阶段N：方案 → 发现的问题 → 改进方案</field>
+        <field name="当前最佳实践">目前推荐的方案</field>
+      </CoreFields>
+      
+      <ExtendedFields optional="true">
+        <field name="初始方案的背景">为什么最初这样设计</field>
+        <field name="未来方向">可能的发展趋势</field>
+      </ExtendedFields>
+      
+      <ClosedLoopCheck>
+        <check>每个阶段是否说明了"发现的问题"？</check>
+        <check>演进是否形成清晰的递进链条？</check>
+      </ClosedLoopCheck>
+    </KnowledgeType>
+
+    <!-- 类型9：架构决策类 -->
+    <KnowledgeType id="9" name="架构决策类" english="Architecture Decision">
+      <applicable_scenario>讲解架构设计中的关键决策点</applicable_scenario>
+      
+      <CoreFields required="true">
+        <field name="决策点">需要做什么选择</field>
+        <field name="可选方案">有哪些选择</field>
+        <field name="评估维度">用什么标准评估</field>
+        <field name="推荐选择">条件 → 推荐方案 → 理由</field>
+      </CoreFields>
+      
+      <ExtendedFields optional="true">
+        <field name="决策背景">为什么需要做这个决策</field>
+        <field name="决策矩阵">每个方案在每个维度的评分</field>
+        <field name="决策后果">选择后需要承担什么</field>
+      </ExtendedFields>
+      
+      <ClosedLoopCheck>
+        <check>推荐选择是否有明确的条件？</check>
+      </ClosedLoopCheck>
+    </KnowledgeType>
+
+  </KnowledgeTypes>
+
+
+  <!-- ==================== 第二部分：教学方法规定 ==================== -->
+  <TeachingMethods>
+
+    <!-- 2.1 技术价值的表达框架 -->
+    <Method id="value-expression" name="技术价值的表达框架">
+      <CorePrinciple>技术价值 = 主体需求 + 客体属性的匹配</CorePrinciple>
+      
+      <Elements>
+        <Element name="主体需求" perspective="问题视角">
+          <item name="对谁而言">明确受众角色（如架构师、开发者、业务方）</item>
+          <item name="需要什么">明确痛点或问题（如性能瓶颈、耦合度高、扩展困难）</item>
+        </Element>
+        
+        <Element name="客体属性" perspective="技术视角">
+          <item name="固有特性">技术本身的能力和机制（如异步非阻塞、广播机制、弱耦合）</item>
+          <note>不是优点：避免主观评价，陈述客观特性</note>
+        </Element>
+        
+        <Element name="价值体现" perspective="匹配视角">
+          <item name="如何满足">客体属性如何解决主体需求</item>
+          <item name="具体效果">量化或具体化的改善（如吞吐量提升6倍、新增订阅者无需修改发布者）</item>
+        </Element>
+      </Elements>
+      
+      <Example>
+        <subject_need>电商系统需要"订单创建后触发多个下游系统的不同处理逻辑"</subject_need>
+        <object_attribute>发布-订阅具有"广播机制"和"弱耦合"特性</object_attribute>
+        <value_manifestation>
+          <item>广播机制 → 满足"触发多个系统"</item>
+          <item>弱耦合 → 满足"不同处理逻辑"</item>
+          <effect>新增订阅者无需修改发布者代码</effect>
+        </value_manifestation>
+      </Example>
+      
+      <CommonErrors>
+        <error>只讲客体属性，不讲主体需求（"发布-订阅很好用"）</error>
+        <error>只讲主体需求，不讲客体属性（"系统需要解耦"）</error>
+        <error>主客体不匹配（用RPC的特性解释发布-订阅的价值）</error>
+      </CommonErrors>
+    </Method>
+
+    <!-- 2.2 设计时检查 -->
+    <Method id="design-checks" name="设计时检查">
+      
+      <Rule id="no-parallel" name="禁止并列" rule_number="22">
+        <description>在所有层级递归消除并列</description>
+        <priority>优先识别逻辑关系：递进/因果/分类/层次/时序/对比</priority>
+        <if_categorical>必须说明排序依据（先后顺序/大小顺序/上下顺序/重要性等）</if_categorical>
+        <forbidden>无序并列：不能简单列出"1. 2. 3."而不说明关系或排序依据</forbidden>
+        <teaching_plan_requirement>在structure字段中明确每个section的逻辑关系或排序依据，并标注"已尝试识别逻辑关系，确实是分类，排序依据是X"</teaching_plan_requirement>
+      </Rule>
+
+      <Rule id="ambiguous-terms" name="模糊词语明确性">
+        <description>使用"按重要性""按优先级""递进""层次"等模糊词语时，必须明确依据</description>
+        <MustAnswer>
+          <question id="1">站在谁的角度？（架构设计者/开发者/用户/系统？）</question>
+          <question id="2">根据什么标准？（性能影响/成本/复杂度/时间顺序？）</question>
+        </MustAnswer>
+        <CommonAmbiguousTerms>
+          <category name="排序类">重要性、优先级、影响程度 → 需明确角度和标准</category>
+          <category name="关系类">递进、层次、因果 → 需明确递进/层次/因果的维度</category>
+          <category name="分类类">核心/次要、主要/辅助 → 需明确判断标准</category>
+        </CommonAmbiguousTerms>
+        <Example type="wrong">按重要性排序：时序特征 > 交互方式 > 数据流方向</Example>
+        <Example type="correct">从架构设计者的决策影响角度，按对系统性能和可用性的影响程度排序：时序特征（决定同步/异步）> 交互方式（决定扩展性）> 数据流方向（实现细节）</Example>
+      </Rule>
+
+      <Rule id="closed-loop" name="闭环思维">
+        <item>机制需要完整闭环：输入→处理→输出→异常</item>
+        <item>权衡需要完整链条：代价→缓解方式→适用场景</item>
+        <item>状态转换需要完整循环：状态A→触发条件→状态B→后续处理</item>
+      </Rule>
+
+      <Rule id="concrete-examples" name="具体示例" rule_number="8">
+        <item>关键概念需要：名称 + 具体数字示例</item>
+        <item>抽象概念需要：类比 + 实际场景</item>
+      </Rule>
+    </Method>
+
+    <!-- 2.3 结构检查 -->
+    <Method id="structure-checks" name="结构检查">
+      <StructureChecks>
+        <check>知识类型是否识别正确？</check>
+        <check>核心字段是否完整？</check>
+        <check>机制是否形成闭环？</check>
+        <check>权衡是否有缓解方式？</check>
+        <check>验证问题是否会导致并列答案？</check>
+        <check>structure是否明确了每个section的逻辑关系或排序依据？</check>
+      </StructureChecks>
+      
+      <SourceChecks>
+        <check>知识是否来自可靠来源？</check>
+        <check>公式/数据是否有出处？</check>
+        <check if="uncertain">标注"待验证"</check>
+      </SourceChecks>
+    </Method>
+
+  </TeachingMethods>
+
+  <!-- ==================== 第三部分：教学经验与反思 ==================== -->
+  <TeachingExperience>
+
+    <CommonProblems>
+      <Problem id="1" name="并列列举">
+        <symptom>直接列出"1. 2. 3."而不说明关系或排序依据</symptom>
+        <cause>习惯性分类列举，绕过逻辑思考</cause>
+        <solution>写之前强制问"关系是什么？"；如果确实是分类，问"排序依据是什么？"</solution>
+      </Problem>
+      
+      <Problem id="2" name="机制不闭环">
+        <symptom>只讲"做什么"，不讲"怎么做"</symptom>
+        <cause>专家盲点，假设学生知道</cause>
+        <solution>检查输入→处理→输出→异常是否完整</solution>
+      </Problem>
+      
+      <Problem id="3" name="权衡无缓解">
+        <symptom>只讲代价，不讲如何缓解</symptom>
+        <cause>停留在问题层面，没有给出解决方案</cause>
+        <solution>每个代价必须配缓解方式</solution>
+      </Problem>
+      
+      <Problem id="4" name="概念未定义">
+        <symptom>使用术语但没有先定义</symptom>
+        <cause>专家盲点，假设学生知道</cause>
+        <solution>首次使用前必须定义</solution>
+      </Problem>
+      
+      <Problem id="5" name="来源不可靠">
+        <symptom>基于推测教授公式或机制</symptom>
+        <cause>过度自信，没有验证</cause>
+        <solution>不确定时停止，先搜索验证</solution>
+      </Problem>
+      
+      <Problem id="6" name="验证问题导致并列答案">
+        <symptom>问"A、B、C分别是什么？"导致学生回答三个并列的点</symptom>
+        <cause>设计验证问题时没有预测学生的回答形式</cause>
+        <solution>优先使用单点深挖、关系考察、场景选择；如果确实需要多点回答，明确分类维度和排序依据</solution>
+      </Problem>
+      
+      <Problem id="7" name="教案structure不够详细">
+        <symptom>只列出要讲的内容（定义、特征、流程），没有说明内部逻辑关系或排序依据</symptom>
+        <cause>把structure当成内容大纲，而不是组织方式说明</cause>
+        <solution>明确每个section内部的逻辑关系；如果是分类，说明排序依据</solution>
+      </Problem>
+    </CommonProblems>
+
+    <LessonsFromRuleEvolution>
+      <Category name="关于内容组织">
+        <lesson>并列是最常见的违规（4次违规记录）</lesson>
+        <lesson>需要强制内部检查：写之前问"关系是什么？"；如果是分类，问"排序依据是什么？"</lesson>
+        <lesson>写完后自检：是否有裸露的"1. 2. 3."？是否说明了排序依据？</lesson>
+      </Category>
+      
+      <Category name="关于模糊词语的明确性">
+        <lesson>使用"按重要性排序""按优先级""递进关系"等模糊词语时，必须明确依据</lesson>
+        <lesson>需要回答：站在谁的角度？根据什么标准？</lesson>
+      </Category>
+      
+      <Category name="关于机制完整性">
+        <lesson>"做什么"必须配"怎么做"</lesson>
+        <lesson>状态转换必须完整：A→B→后果</lesson>
+        <lesson>缺少机制细节会导致学生无法回答"为什么"</lesson>
+      </Category>
+      
+      <Category name="关于验证问题">
+        <lesson>问之前检查：知识是否已教授？</lesson>
+        <lesson>问之前检查：问题是否重要？</lesson>
+        <lesson>不要问未教授的知识或细枝末节</lesson>
+        <lesson>问之前检查：问题是否会导致并列答案？</lesson>
+        <lesson>预测学生回答形式：如果会得到"A是X，B是Y，C是Z"这样的并列答案，需要重新设计问题</lesson>
+      </Category>
+      
+      <Category name="关于来源验证">
+        <lesson>公式必须有出处</lesson>
+        <lesson>机制必须有权威来源</lesson>
+        <lesson>不确定时明确告知学生"这是基于一般理解，未经验证"</lesson>
+      </Category>
+    </LessonsFromRuleEvolution>
+
+  </TeachingExperience>
+
+
+  <!-- ==================== 第四部分：验证问题设计指南 ==================== -->
+  <VerificationQuestionGuide>
+
+    <CorePrinciple>
+      <description>设计验证问题时，必须预测学生的回答形式。如果问题会导致并列答案（如"A是X，B是Y，C是Z"），需要重新设计。</description>
+    </CorePrinciple>
+
+    <Strategies>
+      <Strategy id="1" name="单点深挖" recommended_for="L2/L3">
+        <wrong_example>
+          <question>RPC、消息队列、发布-订阅的调用方式分别是什么？</question>
+          <student_answer>RPC是同步，消息队列是异步，发布-订阅是异步</student_answer>
+        </wrong_example>
+        <correct_example>
+          <question>为什么RPC是同步阻塞的，而消息队列是异步非阻塞的？</question>
+          <expected>学生需要解释因果关系</expected>
+        </correct_example>
+      </Strategy>
+
+      <Strategy id="2" name="关系考察" recommended_for="L2">
+        <wrong_example>
+          <question>消息队列和发布-订阅有哪些区别？</question>
+        </wrong_example>
+        <correct_example>
+          <question>消息队列和发布-订阅的核心区别是什么？这个区别导致了什么结果？</question>
+          <expected>学生需要识别核心区别 + 推导结果</expected>
+        </correct_example>
+      </Strategy>
+
+      <Strategy id="3" name="场景选择" recommended_for="L3">
+        <wrong_example>
+          <question>RPC、消息队列、发布-订阅分别适用什么场景？</question>
+        </wrong_example>
+        <correct_example>
+          <question>在什么场景下应该选择发布-订阅而不是消息队列？</question>
+          <expected>学生需要对比权衡</expected>
+        </correct_example>
+      </Strategy>
+
+      <Strategy id="4" name="分类明确" use_when="确实需要多点回答">
+        <correct_example>
+          <question>从通信模式、调用方式、耦合程度三个维度，对比RPC和消息队列的差异</question>
+          <expected>学生按维度回答，但每个维度内是对比关系，不是并列</expected>
+        </correct_example>
+      </Strategy>
+    </Strategies>
+
+    <Checklist>
+      <item>这个问题会得到几个答案点？</item>
+      <item>如果有多个答案点，它们之间是什么关系？</item>
+      <item>问题是否引导学生思考因果/对比/权衡关系？</item>
+      <item>问题是否避免了"分别是什么"这样的表述？</item>
+    </Checklist>
+
+  </VerificationQuestionGuide>
+
+  <!-- ==================== 第五部分：教案编写指南 ==================== -->
+  <TeachingPlanGuide>
+
+    <Granularity>
+      <rule>一个支撑知识一个教案</rule>
+      <filename_format>[文档名]_[钩子问题编号]_[支撑知识编号].json</filename_format>
+      <example>发布-订阅架构风格_hook12_sk2.json</example>
+    </Granularity>
+
+    <CorePrinciple>
+      <description>教案 = 结构框架，不是内容填充</description>
+      <explanation>教案应该指导"如何组织教学"，而不是"教什么内容"。具体内容由教师在教学时根据自身知识填充，并通过权威来源验证。</explanation>
+    </CorePrinciple>
+
+    <ShouldInclude type="结构性">
+      <item>知识类型判断</item>
+      <item>组织方式（逻辑关系）</item>
+      <item>验证问题设计框架（L1/L2/L3方向，不是具体问题）</item>
+      <item>风险点提醒</item>
+      <item>过渡关系</item>
+    </ShouldInclude>
+
+    <ShouldNotInclude type="内容性">
+      <item>具体定义文本</item>
+      <item>具体示例和数据</item>
+      <item>完整的工作流程描述</item>
+      <item>详细的对比表格内容</item>
+    </ShouldNotInclude>
+
+    <TemplateStructure>
+      <![CDATA[
+{
+  "hook_question": "所属钩子问题",
+  "support_knowledge": "支撑知识名称",
+  "knowledge_type": "知识类型（9种之一）",
+  "role_in_hook": "这个支撑知识如何帮助回答钩子问题",
+  
+  "structure": {
+    "organization": "整体组织方式（如：演进关系、对比维度、因果链条）",
+    "section_name": {
+      "逻辑关系": "这个section内部的逻辑关系（因果/递进/层次/时序/对比）",
+      "排序依据": "如果是分类，说明排序依据，并标注'已尝试识别逻辑关系，确实是分类'",
+      "具体内容": "...",
+      "说明": "为什么这样组织"
+    }
+  },
+  
+  "verification_design": {
+    "L1_direction": "事实性问题的方向（如：定义、特征）",
+    "L2_direction": "因果性问题的方向（如：为什么X导致Y）",
+    "L3_direction": "权衡性问题的方向（如：场景选择）",
+    "pre_embed_hints": ["需要在教学中预埋的线索方向"],
+    "answer_form_check": "预测学生回答形式，避免并列答案"
+  },
+  
+  "bridging": "如何连接到钩子问题（方向，不是具体句子）",
+  
+  "transition_to_next": {
+    "next_knowledge": "下一个支撑知识名称",
+    "relationship": "逻辑关系类型"
+  },
+  
+  "risk_points": [
+    {
+      "risk": "可能违反的规则",
+      "prevention": "预防措施"
+    }
+  ],
+  
+  "content_verification_notes": "教学时需要验证的关键知识点（提醒教师查证）"
+}
+      ]]>
+    </TemplateStructure>
+
+    <Workflow>
+      <step order="1">识别知识类型：这个支撑知识属于哪种类型？</step>
+      <step order="2">填写核心字段：按类型要求填写必须的字段</step>
+      <step order="3">设计structure：明确每个section的逻辑关系或排序依据</step>
+      <step order="4">补充扩展字段：根据需要添加可选字段或自定义字段</step>
+      <step order="5">设计验证问题：L1-L3问题 + 预埋线索 + 预测回答形式</step>
+      <step order="6">设计过渡：与下一个支撑知识的关系和过渡句</step>
+      <step order="7">识别风险：哪些地方容易违反规则？</step>
+    </Workflow>
+
+    <StorageLocation>progress/teaching-plans/</StorageLocation>
+
+  </TeachingPlanGuide>
+
+  <!-- ==================== 第六部分：可复用知识提取 ==================== -->
+  <ReusableKnowledgeExtraction>
+
+    <ExtractionTiming>
+      <timing>创建教案时（教学前）</timing>
+      <timing>学生在教学中发现时也可加入</timing>
+    </ExtractionTiming>
+
+    <ExtractionTypes>
+      <Type id="1" name="比较维度" english="Comparison Dimensions">
+        <SubType name="通用维度">
+          <description>可跨多个技术/场景复用</description>
+          <examples>可扩展性、可用性、一致性、性能、成本</examples>
+        </SubType>
+        <SubType name="特定维度">
+          <description>仅适用于特定技术/场景</description>
+          <examples>Gossip的"冗余度"、Pub/Sub的"匹配延迟"</examples>
+        </SubType>
+        <JudgmentCriteria>能否在3个以上不同技术/场景中使用</JudgmentCriteria>
+      </Type>
+
+      <Type id="2" name="设计原则" english="Design Principles">
+        <definition>解决一类问题的思维模板</definition>
+        <characteristic>可以指导"如何解决"一系列相关问题</characteristic>
+        <examples>纵深防御、分层匹配、冗余换鲁棒</examples>
+      </Type>
+
+      <Type id="3" name="决策模式" english="Decision Patterns">
+        <definition>权衡收益与牺牲的框架</definition>
+        <structure>收益（必要且适用场景）+ 牺牲（可接受且可缓解）</structure>
+        <examples>同步 vs 异步、结构化 vs 无结构、一致性 vs 可用性</examples>
+      </Type>
+    </ExtractionTypes>
+
+    <TeachingPlanAnnotation>
+      <![CDATA[
+{
+  "reusable_knowledge": {
+    "dimensions_used": ["可扩展性", "可用性"],
+    "dimensions_introduced": [
+      {
+        "name": "冗余度",
+        "type": "specific",
+        "definition": "重复传输的程度和成本"
+      }
+    ],
+    "design_principles": [
+      {
+        "name": "冗余换鲁棒",
+        "pattern": "通过增加冗余提高容错能力",
+        "applicable_to": ["分布式协议设计"]
+      }
+    ],
+    "decision_patterns": [
+      {
+        "name": "路由依赖程度",
+        "tradeoff": "强路由（高效但脆弱）vs 弱路由（低效但鲁棒）",
+        "decision_guide": "容错要求高 → 弱路由"
+      }
+    ]
+  }
+}
+      ]]>
+    </TeachingPlanAnnotation>
+
+    <NoteHandling>
+      <handling type="复用维度">直接应用到场景分析，不重复介绍定义</handling>
+      <handling type="新引入维度">需介绍定义、重要性、影响因素</handling>
+    </NoteHandling>
+
+    <StorageLocation>progress/reusable-knowledge.json</StorageLocation>
+
+  </ReusableKnowledgeExtraction>
+
+  <!-- ==================== 更新记录 ==================== -->
+  <UpdateHistory>
+    <Update date="2026-01-06" version="1.0">
+      <item>初始版本</item>
+      <item>定义9种知识结构类型</item>
+      <item>整理教学方法规定</item>
+      <item>提取教学经验与反思</item>
+      <item>制定教案编写指南</item>
+    </Update>
+    <Update date="2026-01-06" version="1.1">
+      <item>新增验证问题设计指南</item>
+      <item>识别"验证问题导致并列答案"的问题</item>
+      <item>提供4种问题设计策略和检查清单</item>
+      <item>更新教案结构模板，增加answer_form_check字段</item>
+    </Update>
+    <Update date="2026-01-06" version="1.2">
+      <item>强化Rule #22（禁止并列）</item>
+      <item>识别"教案structure不够详细"的问题</item>
+      <item>强调优先识别逻辑关系，如果是分类必须说明排序依据</item>
+    </Update>
+    <Update date="2026-01-07" version="1.3">
+      <item>新增可复用知识提取</item>
+      <item>定义三种可复用知识类型：比较维度、设计原则、决策模式</item>
+      <item>新增教案字段：reusable_knowledge</item>
+    </Update>
+    <Update date="2026-01-07" version="2.0">
+      <item>转换为XML格式</item>
+    </Update>
+  </UpdateHistory>
+
+</TeachingManual>

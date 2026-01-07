@@ -1,0 +1,114 @@
+{
+  "verified_data": {
+    "_comment": "已验证的数据，包含来源和验证日期。教学时优先使用这里的数据。",
+    "performance": {
+      "_note": "性能数据高度依赖硬件、配置、负载等因素，以下为参考范围",
+      "rabbitmq_throughput": {
+        "status": "qualitative_only",
+        "description": "RabbitMQ吞吐量受硬件、持久化、消息大小等因素影响，具体数值需实测",
+        "qualitative": "持久化模式吞吐量显著低于非持久化模式（约降低50-80%）",
+        "note": "原笔记中'2-5万条/秒'和'5000-1万条/秒'为特定环境下的参考值，不具普遍性"
+      },
+      "rabbitmq_latency": {
+        "status": "qualitative_only",
+        "description": "消息延迟受网络距离、负载、持久化等因素影响",
+        "qualitative": "本地网络毫秒级，跨地域延迟显著增加（取决于物理距离）",
+        "note": "原笔记中'1-5ms'和'50-200ms'为参考范围，实际需测试"
+      },
+      "matching_latency": {
+        "status": "qualitative_only",
+        "description": "匹配延迟取决于算法复杂度和订阅规模",
+        "qualitative": "主题匹配（字符串比较）远快于内容匹配（数据解析+条件判断），差距可达2-3个数量级",
+        "note": "原笔记中'1-100μs'和'1-100ms'为数量级参考，非精确值"
+      }
+    },
+    "thresholds": {
+      "availability_standards": {
+        "status": "verified",
+        "source": "标准数学计算：故障时间 = 总时间 × (1 - 可用性百分比)",
+        "verified_date": "2026-01-07",
+        "data": {
+          "99%": "每年故障约3.65天（365 × 0.01 = 3.65天）",
+          "99.9%": "每年故障约8.76小时（365 × 24 × 0.001 = 8.76小时）",
+          "99.99%": "每年故障约52.56分钟（365 × 24 × 60 × 0.0001 = 52.56分钟）",
+          "99.999%": "每年故障约5.26分钟（365 × 24 × 60 × 0.00001 = 5.26分钟）"
+        }
+      },
+      "connection_memory": {
+        "status": "qualitative_only",
+        "description": "每个TCP连接的内存消耗取决于缓冲区配置",
+        "qualitative": "每个连接消耗数十KB内存（包含发送/接收缓冲区、连接状态等）",
+        "note": "原笔记中'64KB/个'为参考值，实际取决于系统配置"
+      }
+    },
+    "formulas": {
+      "dht_query_complexity": {
+        "status": "verified",
+        "source": "Chord论文 (Stoica et al., 2001): 'Chord: A Scalable Peer-to-peer Lookup Service for Internet Applications'",
+        "verified_date": "2026-01-07",
+        "formula": "O(log N)",
+        "description": "DHT（如Chord）通过Finger Table实现O(log N)跳数的路由查询"
+      },
+      "gossip_network_load": {
+        "status": "verified",
+        "source": "Gossip协议理论分析，SWIM论文 (Das et al., 2002)",
+        "verified_date": "2026-01-07",
+        "formula": "O(N) per round",
+        "comparison": "传统全连接心跳为O(N²)，Gossip通过随机选择k个邻居降至O(N)"
+      },
+      "gossip_convergence": {
+        "status": "verified",
+        "source": "Gossip协议数学分析",
+        "verified_date": "2026-01-07",
+        "formula": "O(log N) rounds",
+        "description": "Gossip协议在O(log N)轮内以高概率覆盖所有节点"
+      },
+      "availability_formula": {
+        "status": "verified",
+        "source": "可靠性工程标准定义",
+        "verified_date": "2026-01-07",
+        "formula": "可用性 = MTBF / (MTBF + MTTR)",
+        "description": "MTBF=平均故障间隔时间，MTTR=平均修复时间"
+      }
+    }
+  },
+  "comparison_dimensions": {
+    "universal": [
+      {
+        "name": "可扩展性",
+        "definition": "系统处理负载增长的能力",
+        "sub_dimensions": ["规模维度", "弹性维度", "地理维度", "管理维度"]
+      },
+      {
+        "name": "可用性",
+        "definition": "系统在需要时能够正常工作的能力",
+        "sub_dimensions": ["MTBF", "MTTR"]
+      }
+    ],
+    "specific": []
+  },
+  "design_principles": [
+    {
+      "name": "纵深防御",
+      "pattern": "多层防护，每层失效后下一层仍能保护",
+      "applicable_to": ["容错系统设计", "级联故障防护"]
+    },
+    {
+      "name": "分层匹配",
+      "pattern": "粗筛 + 细筛，降低整体计算量",
+      "applicable_to": ["匹配系统", "过滤系统"]
+    }
+  ],
+  "decision_patterns": [
+    {
+      "name": "结构化 vs 无结构",
+      "tradeoff": "高效但脆弱 vs 低效但鲁棒",
+      "decision_guide": "容错要求高 → 无结构；性能要求高 → 结构化"
+    },
+    {
+      "name": "同步 vs 异步",
+      "tradeoff": "立即响应但阻塞 vs 非阻塞但延迟",
+      "decision_guide": "需要立即结果 → 同步；可容忍延迟 → 异步"
+    }
+  ]
+}

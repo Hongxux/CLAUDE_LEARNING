@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  教学前检查清单 - XML版本
+  用途：教学前和记录前的强制检查项
+-->
+
+<Checklists>
+
+  <!-- ==================== 教学前检查 ==================== -->
+  <Checklist id="before-teaching" name="教学前检查" priority="critical">
+    <instruction>必须检查每一项，不可跳过</instruction>
+
+    <!-- 1. 内容组织检查 (Rule #22) -->
+    <CheckItem id="content-organization" name="内容组织" rule="Rule #22" priority="most-critical">
+      
+      <MandatoryInternalCheck trigger="写任何包含2+项的内容之前">
+        <step order="1">关系是什么？（时序/因果/递进/分类/层次/对比）</step>
+        <step order="2">如果是分类：分类维度是什么？</step>
+        <step order="3">如何按这个关系组织？</step>
+      </MandatoryInternalCheck>
+
+      <AmbiguousTermsCheck>
+        <instruction>使用模糊组织词语时，必须回答：</instruction>
+        <question id="perspective">站在谁的角度？（架构师/开发者/用户/系统？）</question>
+        <question id="criteria">根据什么标准？（性能/成本/复杂度/时间？）</question>
+        
+        <CommonAmbiguousTerms>
+          <TermCategory name="排序类">
+            <terms>按重要性、按优先级、按影响程度</terms>
+            <requirement>需明确角度 + 标准</requirement>
+          </TermCategory>
+          <TermCategory name="关系类">
+            <terms>递进、层次、因果</terms>
+            <requirement>需明确递进/层次/因果的维度</requirement>
+          </TermCategory>
+          <TermCategory name="分类类">
+            <terms>核心/次要、主要/辅助</terms>
+            <requirement>需明确判断标准</requirement>
+          </TermCategory>
+        </CommonAmbiguousTerms>
+      </AmbiguousTermsCheck>
+
+      <OutputRequirement>
+        <must>使用关系驱动的结构（总-分 + 明确的关系词）</must>
+        <forbidden>直接列出 "1. 2. 3." 而没有关系上下文</forbidden>
+        <forbidden>使用模糊词语而没有明确标准</forbidden>
+        <example type="correct">总 → 前提条件 → 规模维度 → 资源约束（递进）</example>
+        <example type="correct-with-criteria">从架构设计者角度，按性能影响排序：A（决定同步/异步）> B（决定扩展性）> C（实现细节）</example>
+      </OutputRequirement>
+
+      <SelfCheck trigger="写完后">
+        <question violation="true">我是否刚写了 "1. 2. 3." 或裸露的列表项？</question>
+        <question required="true">关系词是否可见？（前提/因果/递进/对比/层次）</question>
+        <question violation="true">我是否使用了没有标准的模糊词语？</question>
+      </SelfCheck>
+    </CheckItem>
+
+    <!-- 2. 具体示例检查 (Rule #8) -->
+    <CheckItem id="concrete-examples" name="具体示例" rule="Rule #8">
+      <question>关键概念是否已识别？</question>
+      <question>每个概念是否有名称 + 数字示例？</question>
+    </CheckItem>
+
+    <!-- 3. 验证问题设计 (Rule #6) -->
+    <CheckItem id="verification-design" name="验证问题设计" rule="Rule #6">
+      <question>问题是否基于支撑知识的角色设计？</question>
+      <question>L1-L3问题是否准备好？（共5个问题）</question>
+      <question>L2-L3问题的线索是否已预埋？</question>
+      
+      <BeforeAskingEachQuestion>
+        <check id="knowledge">我是否已教授回答这个问题所需的知识？</check>
+        <check id="importance">这个问题是测试核心理解还是只是细节？</check>
+        <action if_fails="either">修改或跳过该问题</action>
+      </BeforeAskingEachQuestion>
+    </CheckItem>
+
+    <!-- 4. 机制完整性检查 (Rule #8 extension) -->
+    <CheckItem id="mechanism-completeness" name="机制完整性" rule="Rule #8 extension" applies_to="机制/实现类知识">
+      <question>维护了什么数据结构？</question>
+      <question>执行了什么操作？</question>
+      <question>边界情况如何处理？（失败、添加、移除）</question>
+      <question>状态转换：系统如何从状态A转到状态B？（完整循环）</question>
+    </CheckItem>
+
+    <!-- 5. 概念边界检查 -->
+    <CheckItem id="concept-boundary" name="概念边界检查">
+      <question>是否引入了未定义的新术语/概念？</question>
+      <question>每个概念是否在首次使用前定义？</question>
+      <question>如果引用外部概念：它们是否在学生的知识库中？</question>
+      <rule>先定义，再使用（无专家盲点）</rule>
+    </CheckItem>
+
+    <!-- 6. 数据验证 (Rule #26, #27) -->
+    <CheckItem id="data-verification" name="数据验证" rule="Rule #26, #27">
+      <Workflow trigger="使用任何数值数据之前">
+        <step order="1">检查 reusable-knowledge.json → verified_data</step>
+        <step order="2" if="found">直接使用</step>
+        <step order="3" if="not_found">
+          <action>使用网络搜索从权威来源验证</action>
+          <acceptable_sources>官方文档、学术论文、技术书籍、官方基准测试</acceptable_sources>
+          <after_verification>添加到 verified_data，包含来源和日期</after_verification>
+        </step>
+        <step order="4" if="cannot_verify">
+          <option>使用定性描述（如"毫秒级"而非"10ms"）</option>
+          <option>使用相对比较（如"比X快10-100倍"）</option>
+          <tell_student>具体数值需要根据实际场景测试</tell_student>
+        </step>
+      </Workflow>
+      
+      <DataTypesRequiringVerification>
+        <type>性能数据（吞吐量、延迟等）</type>
+        <type>阈值（何时触发、何时切换）</type>
+        <type>公式（复杂度、收敛性等）</type>
+        <type>容量限制（连接数、队列长度等）</type>
+      </DataTypesRequiringVerification>
+    </CheckItem>
+
+    <!-- 7. 来源验证 -->
+    <CheckItem id="source-verification" name="来源验证">
+      <question>这个知识是否来自权威来源？</question>
+      <action if="uncertain">停止教学，先搜索</action>
+      <action if="cannot_find_sources">告诉学生"这是基于一般理解，未经验证"</action>
+    </CheckItem>
+
+    <!-- 8. 可复用知识 (Rule #24, #25) -->
+    <CheckItem id="reusable-knowledge" name="可复用知识" rule="Rule #24, #25">
+      <action>检查 reusable-knowledge.json 中已学习的维度</action>
+      <handling type="reused_dimensions">直接应用，不重复介绍</handling>
+      <handling type="new_dimensions">介绍定义、重要性、影响因素</handling>
+    </CheckItem>
+
+  </Checklist>
+
+  <!-- ==================== 记录前检查 ==================== -->
+  <Checklist id="before-recording" name="记录前检查">
+
+    <!-- 1. 答案处理 (Rule #7) -->
+    <CheckItem id="answer-processing" name="答案处理" rule="Rule #7">
+      <question>是否补充了跳跃？</question>
+      <question>是否纠正了错误？</question>
+      <question>是否用学生的声音重新组织？</question>
+    </CheckItem>
+
+    <!-- 2. 桥接解释 (Rule #18) -->
+    <CheckItem id="bridging-explanation" name="桥接解释" rule="Rule #18">
+      <question>是否解释了这如何支撑钩子问题？</question>
+      <note>不要问学生（这是教师的工作）</note>
+    </CheckItem>
+
+    <!-- 3. 过渡准备 (Rule #21) -->
+    <CheckItem id="transition-preparation" name="过渡准备" rule="Rule #21">
+      <question>是否识别了与下一个知识的逻辑关系？</question>
+      <question>是否准备了2-3个过渡选项？</question>
+    </CheckItem>
+
+    <!-- 4. 格式检查 -->
+    <CheckItem id="format-check" name="格式检查">
+      <question>是否使用 fsAppend（而非覆盖）？</question>
+      <question>缩进是否正确（- + Tab）？</question>
+      <question>任何层级是否有并列？</question>
+    </CheckItem>
+
+  </Checklist>
+
+</Checklists>

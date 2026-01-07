@@ -18,17 +18,30 @@ This system is designed to enable AI to **continuously improve its teaching meth
 
 **Solution**: Single source of truth with layered structure.
 
-#### Architecture (Updated 2026-01-05)
+#### Architecture (Updated 2026-01-07)
 
 ```
-CLAUDE.md (~2500 tokens, English)
-    ├─ Critical Rules (3 absolute prohibitions)
-    ├─ Core Teaching Workflow (complete flow)
-    ├─ Essential Rules (23 numbered rules by category)
-    ├─ Quick Reference (knowledge depth, verification levels, logical relationships)
-    ├─ Session Protocol (start/during/end)
-    ├─ Rule Evolution History (1-2 lines each, tracks changes)
-    └─ Note Organization Principles (for student notes)
+CLAUDE.xml (Core config, XML format)
+    ├─ Role (tutor definition)
+    ├─ FileRegistry (session start / on-demand / never read)
+    ├─ CriticalRules (absolute prohibitions)
+    ├─ EssentialRules (numbered rules by category)
+    ├─ QuickReference (knowledge depth, verification levels, logical relationships)
+    ├─ SessionProtocol (start/during/end)
+    ├─ TeachingWorkflow (support knowledge / hook question completion)
+    └─ Protocols (reflection / review / atomic card extraction)
+
+TEACHING-MANUAL.xml (Knowledge types + Teaching methods)
+    ├─ KnowledgeTypes (9 types with core/extended fields)
+    ├─ TeachingMethods (value expression, design checks)
+    ├─ TeachingExperience (common problems, lessons)
+    ├─ VerificationQuestionGuide (4 strategies)
+    ├─ TeachingPlanGuide (structure, workflow)
+    └─ ReusableKnowledgeExtraction (dimensions, principles, patterns)
+
+progress/config/
+    ├─ checklists.xml (pre-teaching / pre-recording checks)
+    └─ note-format.xml (note writing guidelines)
 
 progress/
     ├─ learning-state.json (current progress)
@@ -36,7 +49,7 @@ progress/
     └─ curriculum.json (hook questions structure)
 ```
 
-**Key Change**: Consolidated teaching-reflections.json into CLAUDE.md for better coherence and easier maintenance.
+**Key Change (2026-01-07)**: Converted all config files from Markdown to XML format for better AI parsing and clearer structure.
 
 #### Optimization Techniques
 
@@ -322,21 +335,20 @@ AI records reflection (based on user's correction)
 
 ```
 project/
-├── CLAUDE.md                           # Complete teaching system (~2500 tokens, English)
-│                                       # ├─ Critical Rules (3 prohibitions)
-│                                       # ├─ Core Workflow (complete flow)
-│                                       # ├─ Essential Rules (23 numbered)
-│                                       # ├─ Quick Reference (relationships, levels)
-│                                       # ├─ Session Protocol
-│                                       # ├─ Rule Evolution History
-│                                       # └─ Note Organization Principles
+├── CLAUDE.xml                          # Core tutor config (XML format)
+├── TEACHING-MANUAL.xml                 # Knowledge types + Teaching methods (XML)
 ├── README.md                           # This file (system design documentation)
 ├── progress/
-│   ├── learning-state.json             # Current progress (English)
+│   ├── config/
+│   │   ├── checklists.xml              # Pre-teaching/recording checks (XML)
+│   │   └── note-format.xml             # Note writing guidelines (XML)
+│   ├── learning-state.json             # Current progress
 │   ├── review-schedule.json            # Spaced repetition schedule
 │   ├── curriculum.json                 # Hook questions structure
-│   ├── concepts/                       # Concept definitions (load on-demand)
-│   │   └── 发布-订阅架构风格.json
+│   ├── reusable-knowledge.json         # Reusable dimensions/principles/patterns
+│   ├── active/
+│   │   ├── concepts/                   # Active concept definitions
+│   │   └── teaching-plans/             # Active teaching plans
 │   └── archive/                        # Completed documents
 │       └── [completed].json
 ├── 发布-订阅架构风格.md                  # Learning document (Chinese, student-facing)
@@ -347,18 +359,20 @@ project/
 
 ---
 
-## Token Usage Breakdown (Updated 2026-01-05)
+## Token Usage Breakdown (Updated 2026-01-07)
 
-| Component | Tokens | Frequency | Notes |
+| Component | Format | Frequency | Notes |
 |-----------|--------|-----------|-------|
-| CLAUDE.md | ~2500 | Every session | Complete teaching system |
-| learning-state.json | ~500 | Every session | Current progress |
-| review-schedule.json | ~300 | Every session | Spaced repetition |
-| curriculum.json | ~400 | Every session | Hook questions |
-| concepts (on-demand) | ~1000 | When teaching | Load only when needed |
-| **Total** | **~3700-4700** | | Depends on concepts loaded |
+| CLAUDE.xml | XML | Every session | Core tutor config |
+| TEACHING-MANUAL.xml | XML | Creating plans | Knowledge types + methods |
+| checklists.xml | XML | Before teaching | Pre-check lists |
+| note-format.xml | XML | Before recording | Note guidelines |
+| learning-state.json | JSON | Every session | Current progress |
+| review-schedule.json | JSON | Every session | Spaced repetition |
+| curriculum.json | JSON | Every session | Hook questions |
+| concepts (on-demand) | JSON | When teaching | Load only when needed |
 
-**Key**: Unified system in CLAUDE.md provides clarity and consistency
+**Key**: XML format provides clearer structure for AI parsing
 
 ---
 
@@ -418,8 +432,8 @@ Potential areas for enhancement:
 
 To use this system:
 
-1. Read `CLAUDE.md` to understand the complete teaching system
-2. Review `Rule Evolution History` to see how system improved
+1. Read `CLAUDE.xml` to understand the core tutor configuration
+2. Review `TEACHING-MANUAL.xml` for knowledge types and teaching methods
 3. Start a learning session with "继续学习"
 4. Provide feedback when teaching isn't working (use "复述理解，分享疑问")
 5. Watch the system improve through your feedback
@@ -480,19 +494,21 @@ After learning sessions, you'll have:
 
 ## How to Customize for Your Own Learning
 
-### Step 1: Modify Student Background (CLAUDE.md)
+### Step 1: Modify Student Background (CLAUDE.xml)
 
-Edit the `Role` section in `CLAUDE.md` to match your background:
+Edit the `Role` section in `CLAUDE.xml` to match your background:
 
-```markdown
-## Role
-Interactive tutor for [YOUR ROLE] with [YOUR BACKGROUND] but [YOUR GAPS].
+```xml
+<Role>
+  <description>Interactive tutor for [YOUR ROLE] with [YOUR BACKGROUND] but [YOUR GAPS].</description>
+</Role>
 ```
 
 **Example**:
-```markdown
-## Role
-Interactive tutor for frontend developer with React/TypeScript experience but no backend or distributed systems knowledge.
+```xml
+<Role>
+  <description>Interactive tutor for frontend developer with React/TypeScript experience but no backend or distributed systems knowledge.</description>
+</Role>
 ```
 
 ### Step 2: Create Your Learning Document
@@ -577,20 +593,21 @@ Create `progress/curriculum.json`:
 
 ### Step 5: Customize Teaching Methods (Optional)
 
-The teaching system is now unified in `CLAUDE.md`. To customize:
+The teaching system is now in XML format. To customize:
 
-**Correctness Rules**: Add domain-specific rules to the Essential Rules section
+**CLAUDE.xml**: Add domain-specific rules to the EssentialRules section
 
-**Logical Relationships**: Add domain-specific relationship types to Quick Reference
+**TEACHING-MANUAL.xml**: Add domain-specific knowledge types or teaching methods
 
-**Note Format**: Modify Note Organization Principles if using different tool than Obsidian
+**note-format.xml**: Modify if using different tool than Obsidian
 
 ### Example: Customizing for Kubernetes Learning
 
-**CLAUDE.md**:
-```markdown
-## Role
-Interactive tutor for DevOps engineer with Docker experience but no Kubernetes production experience.
+**CLAUDE.xml**:
+```xml
+<Role>
+  <description>Interactive tutor for DevOps engineer with Docker experience but no Kubernetes production experience.</description>
+</Role>
 ```
 
 **kubernetes-architecture.md**:
@@ -664,11 +681,9 @@ This system evolved through iterative improvement during actual teaching session
 - Discovering the need for recursive application of principles
 - Realizing reflections must be enforced through pre-checks
 
-**Major Evolution** (2026-01-05):
-- Consolidated teaching-reflections.json into CLAUDE.md for better coherence
-- Introduced recursive no-parallel principle (Rule #22)
-- Added reflection enforcement through pre-checks (Rule #23)
-- Refined verification answer processing (Rule #7)
-- Enhanced student participation mechanisms (Rules #17, #19)
+**Major Evolution**:
+- 2026-01-05: Consolidated teaching-reflections.json into CLAUDE.md
+- 2026-01-05: Introduced recursive no-parallel principle (Rule #22)
+- 2026-01-07: Converted all config files from Markdown to XML format for better AI parsing
 
 The system is designed to continue evolving through the same collaborative process.
