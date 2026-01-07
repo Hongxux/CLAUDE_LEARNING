@@ -12,7 +12,8 @@
     "钩子问题8_中心化匹配瓶颈": "completed",
     "钩子问题9_瓶颈对可用性影响": "completed",
     "钩子问题10_DHT去中心化": "completed",
-    "钩子问题11_Gossip协议": "in_progress"
+    "钩子问题11_Gossip协议": "completed",
+    "钩子问题12_金融场景适配": "in_progress"
   },
   "concepts_progress": {
     "发布-订阅架构风格": "partial",
@@ -21,10 +22,6 @@
     "事件总线": "partial"
   },
   "doubts": [],
-  "last_session": "2026-01-05",
-  "pending_supplements": [
-    "如何区分Push-Pull混合模式的前期和后期（两种方式）",
-    "Fanout参数k的详细权衡分析",
-    "三种故障类型的详细解释（单点故障、网络分区、节点动态变化）"
-  ]
+  "last_session": "2026-01-06",
+  "pending_supplements": []
 }
