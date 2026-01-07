@@ -1,13 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  教学前检查清单 - XML版本
-  用途：教学前和记录前的强制检查项
+  检查清单 - XML版本
+  用途：教学前、记录前、教案编写的强制检查项
+  版本：3.0 (2026-01-07)
 -->
 
 <Checklists>
 
-  <!-- ==================== 教学前检查 ==================== -->
-  <Checklist id="before-teaching" name="教学前检查" priority="critical">
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       合约：本清单的目标与成功标准
+       ═══════════════════════════════════════════════════════════════════════════ -->
+  <Contract>
+    <Purpose>确保教学和记录过程遵循所有规则</Purpose>
+    <SuccessCriteria>
+      <criterion>教学内容无并列列举</criterion>
+      <criterion>所有数据经过验证</criterion>
+      <criterion>笔记格式符合规范</criterion>
+      <criterion>验证问题避免并列答案</criterion>
+    </SuccessCriteria>
+    <Usage>
+      <when>教学前加载"教学前检查"</when>
+      <when>记录前加载"记录前检查"</when>
+      <when>创建教案后加载"教案编写检查"</when>
+    </Usage>
+  </Contract>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       教学前检查（Pre-hook）
+       ═══════════════════════════════════════════════════════════════════════════ -->
+  <Checklist id="before-teaching" name="教学前检查" phase="Pre-hook" priority="critical">
     <instruction>必须检查每一项，不可跳过</instruction>
 
     <!-- 1. 内容组织检查 (Rule #22) -->
@@ -128,6 +149,175 @@
       <handling type="reused_dimensions">直接应用，不重复介绍</handling>
       <handling type="new_dimensions">介绍定义、重要性、影响因素</handling>
     </CheckItem>
+
+  </Checklist>
+
+  <!-- ==================== 教案编写检查 ==================== -->
+  <Checklist id="teaching-plan-writing" name="教案编写检查" priority="critical">
+    <instruction>编写教案后，必须逐项检查以下清单，确认全部通过后才能输出。不可跳过任何检查项。</instruction>
+
+    <!-- 1. 结构vs内容检查 -->
+    <CheckItem id="structure-vs-content" name="结构vs内容" priority="most-critical">
+      <principle>教案 = 结构框架，不是内容填充</principle>
+      <question>structure字段是否只包含组织指导，不包含具体知识点名称？</question>
+      
+      <BadExample>
+        <code>"内容": ["TLS传输层加密", "端到端加密", "消息签名"]</code>
+        <reason>这是具体知识点，属于内容</reason>
+      </BadExample>
+      
+      <GoodExample>
+        <code>"内部组织": "递进关系", "递进依据": "按信任边界扩展：信任中间件→不信任中间件"</code>
+        <reason>这是组织方式，属于结构</reason>
+      </GoodExample>
+      
+      <ForbiddenInStructure>
+        <item>具体技术名称（如TLS、JWT、RBAC）</item>
+        <item>具体定义文本</item>
+        <item>具体示例和数据</item>
+        <item>完整的工作流程描述</item>
+      </ForbiddenInStructure>
+      
+      <AllowedInStructure>
+        <item>逻辑关系类型（递进/演进/因果/对比/时序）</item>
+        <item>排序依据说明</item>
+        <item>子结构要求（需要包含哪些字段）</item>
+        <item>闭环要求（输入→处理→输出→异常）</item>
+      </AllowedInStructure>
+    </CheckItem>
+
+    <!-- 2. 组织细化检查 -->
+    <CheckItem id="organization-detail" name="组织细化" priority="critical">
+      <question>每个section是否包含以下三要素？</question>
+      
+      <RequiredElements>
+        <element name="逻辑关系类型">递进/演进/因果/对比/时序/分类</element>
+        <element name="排序依据">如果是分类或递进，依据是什么</element>
+        <element name="子结构要求">每个子项需要包含哪些字段</element>
+      </RequiredElements>
+      
+      <BadExample>
+        <code>"section_1": {"说明": "讲解两个防窃听方案"}</code>
+        <reason>缺少逻辑关系、排序依据、子结构要求</reason>
+      </BadExample>
+      
+      <GoodExample>
+        <code>
+"section_1_防窃听": {
+  "内部组织": "递进关系",
+  "递进依据": "按信任边界扩展：信任中间件→不信任中间件",
+  "每个子方案需要包含": {
+    "机制": "保护的是什么",
+    "效果": "解决什么威胁",
+    "代价": "有什么限制",
+    "缓解": "如何降低代价",
+    "场景": "什么时候用"
+  },
+  "递进链条要求": "方案A的局限 → 方案B如何解决"
+}
+        </code>
+        <reason>包含了逻辑关系、排序依据、子结构要求、链条要求</reason>
+      </GoodExample>
+    </CheckItem>
+
+    <!-- 3. 闭环要求检查 -->
+    <CheckItem id="closed-loop" name="闭环要求">
+      <question>机制类内容是否明确要求完整闭环？</question>
+      
+      <ClosedLoopStructure>
+        <step>输入：什么触发这个机制</step>
+        <step>处理：具体步骤是什么</step>
+        <step>输出：产生什么结果</step>
+        <step>异常/验证：边界情况或验证方式</step>
+      </ClosedLoopStructure>
+      
+      <BadExample>
+        <code>"闭环要求": "需要讲清楚机制"</code>
+        <reason>太模糊，没有具体要求</reason>
+      </BadExample>
+      
+      <GoodExample>
+        <code>
+"闭环要求": {
+  "输入": "什么触发签名过程",
+  "处理": "签名的具体步骤（发布者侧）",
+  "输出": "产生什么（消息+签名）",
+  "验证": "订阅者如何验证（验证步骤+失败处理）"
+}
+        </code>
+        <reason>明确了每个闭环步骤需要回答的问题</reason>
+      </GoodExample>
+    </CheckItem>
+
+    <!-- 4. 链条要求检查 -->
+    <CheckItem id="chain-requirement" name="链条要求">
+      <question>递进/演进关系是否明确要求说明"前一个的问题→后一个如何解决"？</question>
+      
+      <BadExample>
+        <code>"递进关系": "按安全强度递进"</code>
+        <reason>只说了递进，没有要求说明递进原因</reason>
+      </BadExample>
+      
+      <GoodExample>
+        <code>
+"递进关系": "按安全强度递进",
+"递进链条要求": "方案A的安全漏洞 → 方案B如何弥补 → 方案B的新问题 → 方案C如何解决"
+        </code>
+        <reason>明确要求说明每个递进的原因</reason>
+      </GoodExample>
+    </CheckItem>
+
+    <!-- 5. 决策结构检查 -->
+    <CheckItem id="decision-structure" name="决策结构">
+      <question>涉及场景选择的内容是否使用"条件→选择→理由"结构？</question>
+      
+      <BadExample>
+        <code>"组合策略": "讲解常规场景和高安全场景的选择"</code>
+        <reason>没有明确决策结构</reason>
+      </BadExample>
+      
+      <GoodExample>
+        <code>
+"组合策略": {
+  "内部组织": "决策关系",
+  "决策结构": "条件（什么场景）→ 选择（用什么方案）→ 理由（为什么）",
+  "需要覆盖的场景": ["常规场景", "高安全场景"],
+  "每个场景需要回答": "信任边界在哪 → 选择什么组合 → 为什么这个组合足够/必要"
+}
+        </code>
+        <reason>明确了决策结构和每个场景需要回答的问题</reason>
+      </GoodExample>
+    </CheckItem>
+
+    <!-- 6. 验证问题设计检查 -->
+    <CheckItem id="verification-design" name="验证问题设计">
+      <question>answer_form_check是否明确避免并列答案？</question>
+      
+      <BadExample>
+        <code>"L1_direction": "三种方案分别是什么"</code>
+        <reason>会导致并列答案</reason>
+      </BadExample>
+      
+      <GoodExample>
+        <code>
+"L1_direction": "机制的保护对象和作用范围",
+"L2_direction": "为什么某机制有某代价（因果链）",
+"answer_form_check": "避免'两种方案分别是什么'，使用'为什么常规场景选择X而不是Y'"
+        </code>
+        <reason>L2使用因果关系，避免并列</reason>
+      </GoodExample>
+    </CheckItem>
+
+    <!-- 最终自检 -->
+    <FinalSelfCheck>
+      <instruction>输出教案前，逐项确认：</instruction>
+      <check>□ structure字段不包含具体技术名称或知识点</check>
+      <check>□ 每个section都有：逻辑关系 + 排序依据 + 子结构要求</check>
+      <check>□ 机制类内容有完整的闭环要求（输入→处理→输出→异常）</check>
+      <check>□ 递进/演进关系有链条要求（前一个的问题→后一个如何解决）</check>
+      <check>□ 场景选择有决策结构（条件→选择→理由）</check>
+      <check>□ 验证问题避免并列答案</check>
+    </FinalSelfCheck>
 
   </Checklist>
 

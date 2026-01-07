@@ -2,15 +2,39 @@
 <!--
   笔记编写规范 - XML版本
   用途：指导AI如何编写和组织学习笔记
+  版本：3.0 (2026-01-07)
 -->
 
 <NoteFormatSpec>
 
-  <Purpose>
-    <goal>不是记录，而是重组知识的逻辑结构</goal>
-    <core_requirement>消除并列，显化逻辑关系</core_requirement>
-    <principle>格式服务于逻辑，不是为了美观</principle>
-  </Purpose>
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       合约：本规范的目标与成功标准
+       ═══════════════════════════════════════════════════════════════════════════ -->
+  <Contract>
+    <Purpose>
+      <goal>不是记录，而是重组知识的逻辑结构</goal>
+      <core_requirement>消除并列，显化逻辑关系</core_requirement>
+      <principle>格式服务于逻辑，不是为了美观</principle>
+    </Purpose>
+    <SuccessCriteria>
+      <criterion>所有缩进行都有列表标记（- 或 1.）</criterion>
+      <criterion>无并列列举（或已说明逻辑关系）</criterion>
+      <criterion>核心概念已加粗</criterion>
+      <criterion>无来源标注（融合为统一知识点）</criterion>
+    </SuccessCriteria>
+  </Contract>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       自检清单：记录笔记后必须检查（Post-hook）
+       ═══════════════════════════════════════════════════════════════════════════ -->
+  <SelfCheck trigger="记录笔记后，输出前" phase="Post-hook">
+    <check id="NF-1">□ 所有缩进行是否都有列表标记（- 或 1.）？</check>
+    <check id="NF-2">□ 是否有裸露的并列列举？如有，是否说明了逻辑关系？</check>
+    <check id="NF-3">□ 小标题是否只使用 ### 和 ####？</check>
+    <check id="NF-4">□ 分割线是否只在钩子问题之间？</check>
+    <check id="NF-5">□ 核心概念是否已加粗？</check>
+    <check id="NF-6">□ 是否删除了来源标注（"学生理解""补充讲解"）？</check>
+  </SelfCheck>
 
   <!-- ==================== 第一部分：格式规则 ==================== -->
   <FormatRules required="true">
@@ -177,11 +201,10 @@
     <item>核心概念已加粗</item>
   </Checklist>
 
-</NoteFormatSpec>
-
-
-  <!-- ==================== 第五部分：参考示例 ==================== -->
-  <Examples optional="true">
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       参考示例（正反对比）
+       ═══════════════════════════════════════════════════════════════════════════ -->
+  <Examples>
 
     <Example id="hook-question-record" name="钩子问题记录示例">
       <description>展示如何记录一个钩子问题及其支撑知识</description>
@@ -230,6 +253,23 @@
 		- 缓解：顺序写 + 页缓存
 		- 场景：所有需要持久化的消息
 ]]></template>
+    </Example>
+
+    <!-- 正反对比示例 -->
+    <Example id="parallel-vs-logical" name="并列 vs 逻辑关系">
+      <wrong><![CDATA[
+三种通信模式：
+1. RPC
+2. 消息队列
+3. 发布-订阅
+（问题：无逻辑关系的并列）
+      ]]></wrong>
+      <correct><![CDATA[
+三种通信模式的选择本质上是权衡（递进关系：解耦程度递增）：
+- RPC：牺牲解耦 → 换取立即响应
+- 消息队列：牺牲立即响应 → 换取时间解耦
+- 发布-订阅：进一步牺牲调试便利性 → 换取空间解耦
+      ]]></correct>
     </Example>
 
   </Examples>
