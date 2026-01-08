@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  检查清单 - XML版本
-  用途：教学前、记录前、教案编写的强制检查项
-  版本：3.0 (2026-01-07)
+  checklists.xml - 教学检查清单
+  
+  结构设计：按教学流程的时序组织
+  - Pre-hook（教学前）→ In-process（教学中）→ Post-hook（教学后）
+  
+  版本：4.0 (2026-01-08)
 -->
 
 <Checklists>
 
-  <!-- ═══════════════════════════════════════════════════════════════════════════
-       合约：本清单的目标与成功标准
-       ═══════════════════════════════════════════════════════════════════════════ -->
-  <Contract>
-    <Purpose>确保教学和记录过程遵循所有规则</Purpose>
+  <!-- ╔═══════════════════════════════════════════════════════════════════════════╗
+       ║                           核心目标                                        ║
+       ╚═══════════════════════════════════════════════════════════════════════════╝ -->
+  <CoreGoal>
+    <Mission>确保教学和记录过程遵循所有规则，在正确的时机进行正确的检查</Mission>
     <SuccessCriteria>
       <criterion>教学内容无并列列举</criterion>
       <criterion>所有数据经过验证</criterion>
@@ -19,337 +22,228 @@
       <criterion>验证问题避免并列答案</criterion>
     </SuccessCriteria>
     <Usage>
-      <when>教学前加载"教学前检查"</when>
-      <when>记录前加载"记录前检查"</when>
-      <when>创建教案后加载"教案编写检查"</when>
+      <when>教学前：加载 Pre-hook 检查</when>
+      <when>教学中：执行 In-process 检查</when>
+      <when>教学后：执行 Post-hook 检查</when>
     </Usage>
-  </Contract>
+  </CoreGoal>
 
-  <!-- ═══════════════════════════════════════════════════════════════════════════
-       教学前检查（Pre-hook）
-       ═══════════════════════════════════════════════════════════════════════════ -->
-  <Checklist id="before-teaching" name="教学前检查" phase="Pre-hook" priority="critical">
-    <instruction>必须检查每一项，不可跳过</instruction>
+  <!-- ╔═══════════════════════════════════════════════════════════════════════════╗
+       ║                    第一阶段：Pre-hook（教学前检查）                          ║
+       ║  目的：在教学开始前确保准备充分，避免教学过程中出现问题                         ║
+       ║  时机：收到教学请求后，开始教学前                                            ║
+       ╚═══════════════════════════════════════════════════════════════════════════╝ -->
+  <PreHook phase="教学前" trigger="收到教学请求后，开始教学前">
+    <Purpose>确保教学准备充分，预防问题而非事后修正</Purpose>
+    
+    <!-- 1. 意图确认（防止答非所问） -->
+    <Check id="PRE-1" name="意图确认" priority="high">
+      <why>误解意图会导致整个教学方向错误</why>
+      <trigger>问题模糊/多义/超出范围时</trigger>
+      <action>复述理解 → 提供选项 → 获得确认</action>
+      <exception>简单明确的问题可直接回答</exception>
+    </Check>
+    
+    <!-- 2. 知识边界声明（减少幻觉） -->
+    <Check id="PRE-2" name="知识边界声明" priority="high">
+      <why>主动声明边界，避免在不确定领域过度自信</why>
+      <trigger>开始新内容/涉及具体数值/最新技术时</trigger>
+      <format>确定知道 | 可能知道 | 不确定</format>
+    </Check>
+    
+    <!-- 3. 数据验证（确保准确性） -->
+    <Check id="PRE-3" name="数据验证" priority="high">
+      <why>错误的数据会误导学生</why>
+      <workflow>
+        <step order="1">检查 reusable-knowledge.json → verified_data</step>
+        <step order="2" if="not_found">网络搜索验证</step>
+        <step order="3" if="cannot_verify">使用定性描述（如"毫秒级"而非"10ms"）</step>
+      </workflow>
+      <types_requiring_verification>性能数据、阈值、公式、容量限制</types_requiring_verification>
+    </Check>
+    
+    <!-- 4. 可复用知识检查 -->
+    <Check id="PRE-4" name="可复用知识" priority="medium">
+      <why>避免重复介绍已学过的维度</why>
+      <action>检查 reusable-knowledge.json 中已学习的维度</action>
+      <handling type="reused">直接应用，不重复介绍</handling>
+      <handling type="new">介绍定义、重要性、影响因素</handling>
+    </Check>
+    
+    <!-- 5. 概念边界检查 -->
+    <Check id="PRE-5" name="概念边界" priority="medium">
+      <why>先定义再使用，避免专家盲点</why>
+      <questions>
+        <question>是否引入了未定义的新术语？</question>
+        <question>每个概念是否在首次使用前定义？</question>
+        <question>引用的外部概念是否在学生知识库中？</question>
+      </questions>
+    </Check>
+  </PreHook>
 
-    <!-- 1. 内容组织检查 (Rule #22) -->
-    <CheckItem id="content-organization" name="内容组织" rule="Rule #22" priority="most-critical">
+
+  <!-- ╔═══════════════════════════════════════════════════════════════════════════╗
+       ║                    第二阶段：In-process（教学中检查）                         ║
+       ║  目的：边教边查，及时发现和修正问题                                          ║
+       ║  时机：生成教学内容时                                                       ║
+       ╚═══════════════════════════════════════════════════════════════════════════╝ -->
+  <InProcess phase="教学中" trigger="生成教学内容时">
+    <Purpose>边写边查，问题发现越早修正成本越低</Purpose>
+    
+    <!-- 1. 内容组织检查（最关键） -->
+    <Check id="IN-1" name="内容组织" priority="critical">
+      <why>并列列举无法体现知识点之间的关系</why>
       
       <MandatoryInternalCheck trigger="写任何包含2+项的内容之前">
         <step order="1">关系是什么？（时序/因果/递进/分类/层次/对比）</step>
         <step order="2">如果是分类：分类维度是什么？</step>
         <step order="3">如何按这个关系组织？</step>
       </MandatoryInternalCheck>
-
-      <AmbiguousTermsCheck>
-        <instruction>使用模糊组织词语时，必须回答：</instruction>
-        <question id="perspective">站在谁的角度？（架构师/开发者/用户/系统？）</question>
-        <question id="criteria">根据什么标准？（性能/成本/复杂度/时间？）</question>
-        
-        <CommonAmbiguousTerms>
-          <TermCategory name="排序类">
-            <terms>按重要性、按优先级、按影响程度</terms>
-            <requirement>需明确角度 + 标准</requirement>
-          </TermCategory>
-          <TermCategory name="关系类">
-            <terms>递进、层次、因果</terms>
-            <requirement>需明确递进/层次/因果的维度</requirement>
-          </TermCategory>
-          <TermCategory name="分类类">
-            <terms>核心/次要、主要/辅助</terms>
-            <requirement>需明确判断标准</requirement>
-          </TermCategory>
-        </CommonAmbiguousTerms>
-      </AmbiguousTermsCheck>
-
+      
       <OutputRequirement>
         <must>使用关系驱动的结构（总-分 + 明确的关系词）</must>
         <forbidden>直接列出 "1. 2. 3." 而没有关系上下文</forbidden>
-        <forbidden>使用模糊词语而没有明确标准</forbidden>
-        <example type="correct">总 → 前提条件 → 规模维度 → 资源约束（递进）</example>
-        <example type="correct-with-criteria">从架构设计者角度，按性能影响排序：A（决定同步/异步）> B（决定扩展性）> C（实现细节）</example>
+        <forbidden>使用模糊词语（按重要性、按优先级）而没有明确标准</forbidden>
       </OutputRequirement>
-
+      
       <SelfCheck trigger="写完后">
-        <question violation="true">我是否刚写了 "1. 2. 3." 或裸露的列表项？</question>
-        <question required="true">关系词是否可见？（前提/因果/递进/对比/层次）</question>
+        <question violation="true">我是否刚写了裸露的列表项？</question>
+        <question required="true">关系词是否可见？</question>
         <question violation="true">我是否使用了没有标准的模糊词语？</question>
       </SelfCheck>
-    </CheckItem>
+    </Check>
+    
+    <!-- 2. 内容密度检查 -->
+    <Check id="IN-2" name="内容密度" priority="high">
+      <why>防止形式主义，确保内容有实质</why>
+      <four_elements>
+        <element>是什么：定义 + 核心特征</element>
+        <element>为什么：解决什么问题 + 为什么这样设计</element>
+        <element>怎么用：适用场景 + 使用方式</element>
+        <element>什么时候不用：不适用场景 + 替代方案</element>
+      </four_elements>
+      <specificity>
+        <forbidden>禁止"提高性能"这样的模糊表述</forbidden>
+        <required>必须说明"提高什么、提高多少、在什么条件下"</required>
+      </specificity>
+    </Check>
+    
+    <!-- 3. 机制完整性检查 -->
+    <Check id="IN-3" name="机制完整性" priority="high" applies_to="机制/协议类知识">
+      <why>只讲"做什么"不讲"怎么做"，学生无法真正理解</why>
+      <closed_loop>
+        <element>输入：什么触发这个机制？</element>
+        <element>处理：具体步骤是什么？</element>
+        <element>输出：产生什么效果？</element>
+        <element>异常：边界情况如何处理？</element>
+      </closed_loop>
+    </Check>
+    
+    <!-- 4. 边界完整性检查 -->
+    <Check id="IN-4" name="边界完整" priority="medium">
+      <why>只说好处不说限制，会误导学生</why>
+      <rules>
+        <rule>每个"适用场景"必须配"不适用场景"</rule>
+        <rule>每个"代价"必须配"缓解方式"</rule>
+      </rules>
+    </Check>
+    
+    <!-- 5. 段落级检查点 -->
+    <Checkpoint trigger="每输出一个知识点/段落后">
+      <check>内容密度：四要素是否完整？</check>
+      <check>具体性：是否有模糊表述需要具体化？</check>
+      <check>边界：是否只说了适用没说不适用？</check>
+      <check>逻辑：多项内容是否说明了关系？</check>
+      <action if_fails>立即修正当前段落，不要等到最后</action>
+    </Checkpoint>
+  </InProcess>
 
-    <!-- 2. 具体示例检查 (Rule #8) -->
-    <CheckItem id="concrete-examples" name="具体示例" rule="Rule #8">
-      <question>关键概念是否已识别？</question>
-      <question>每个概念是否有名称 + 数字示例？</question>
-    </CheckItem>
 
-    <!-- 3. 验证问题设计 (Rule #6) -->
-    <CheckItem id="verification-design" name="验证问题设计" rule="Rule #6">
-      <question>问题是否基于支撑知识的角色设计？</question>
-      <question>L1-L3问题是否准备好？（共5个问题）</question>
-      <question>L2-L3问题的线索是否已预埋？</question>
-      
-      <BeforeAskingEachQuestion>
-        <check id="knowledge">我是否已教授回答这个问题所需的知识？</check>
-        <check id="importance">这个问题是测试核心理解还是只是细节？</check>
-        <action if_fails="either">修改或跳过该问题</action>
-      </BeforeAskingEachQuestion>
-    </CheckItem>
+  <!-- ╔═══════════════════════════════════════════════════════════════════════════╗
+       ║                    第三阶段：Post-hook（教学后检查）                          ║
+       ║  目的：最后防线，确保输出符合所有质量标准                                     ║
+       ║  时机：发送响应前 / 记录笔记后                                              ║
+       ╚═══════════════════════════════════════════════════════════════════════════╝ -->
+  <PostHook phase="教学后" trigger="发送响应前 / 记录笔记后">
+    <Purpose>最后一道防线，确保没有遗漏</Purpose>
+    
+    <!-- 1. P0规则检查（绝对边界） -->
+    <Check id="POST-1" name="P0规则检查" priority="critical">
+      <why>P0规则在任何情况下都不可违反</why>
+      <items>
+        <item rule="P0-1">□ 文件操作是否已获得用户确认？</item>
+        <item rule="P0-2">□ 是否避免了读取学生笔记？</item>
+        <item rule="P0-3">□ 是否无并列列举（或已说明逻辑关系）？</item>
+        <item rule="P0-4">□ 配置修改是否已讨论？</item>
+      </items>
+    </Check>
+    
+    <!-- 2. 违规模式匹配 -->
+    <Check id="POST-2" name="违规模式匹配" priority="high">
+      <why>将规则检查从主观判断变成模式匹配</why>
+      <patterns>
+        <pattern id="VP-1" name="裸露的编号列表">出现"1. 2. 3."但没有关系词</pattern>
+        <pattern id="VP-2" name="模糊效果描述">出现"提高性能"等模糊词但没有具体说明</pattern>
+        <pattern id="VP-3" name="只有适用没有不适用">出现"适用于"但没有"不适用"</pattern>
+        <pattern id="VP-4" name="机制无闭环">讲解机制时只有"做什么"没有完整闭环</pattern>
+        <pattern id="VP-5" name="代价无缓解">出现"代价"但没有"缓解"</pattern>
+        <pattern id="VP-6" name="概念无示例">引入新概念但没有具体数字或实例</pattern>
+        <pattern id="VP-7" name="超出知识边界未声明">涉及具体配置但没有知识边界声明</pattern>
+      </patterns>
+    </Check>
+    
+    <!-- 3. 自我质疑 -->
+    <Check id="POST-3" name="自我质疑" priority="high">
+      <why>AI可能对错误答案过度自信，需要主动质疑自己</why>
+      <questions>
+        <question>我可能错在哪里？（列出1-2个可能的错误点）</question>
+        <question>推理链中最弱的环节是什么？</question>
+        <question>有没有替代解释？</question>
+        <question>如果我是学生，我会在哪里困惑？</question>
+      </questions>
+      <action>发现的弱点必须在输出中体现（添加置信度标注或补充说明）</action>
+    </Check>
+    
+    <!-- 4. 验证问题检查 -->
+    <Check id="POST-4" name="验证问题检查" priority="medium" applies_to="设计验证问题时">
+      <why>避免验证问题导致并列答案</why>
+      <questions>
+        <question>问题是否基于支撑知识的角色设计？</question>
+        <question>L1-L3问题是否准备好？（共5个问题）</question>
+        <question>L2-L3问题的线索是否已预埋？</question>
+        <question>预测答案形式：会不会得到并列答案？</question>
+      </questions>
+    </Check>
+    
+    <!-- 5. 笔记格式检查 -->
+    <Check id="POST-5" name="笔记格式检查" priority="medium" applies_to="记录笔记后">
+      <why>确保笔记在Obsidian中正确渲染</why>
+      <items>
+        <item id="NF-1">□ 所有缩进行是否都有列表标记（- 或 1.）？</item>
+        <item id="NF-2">□ 是否有裸露的并列列举？如有，是否说明了逻辑关系？</item>
+        <item id="NF-3">□ 小标题是否只使用 ### 和 ####？</item>
+        <item id="NF-4">□ 分割线是否只在钩子问题之间？</item>
+        <item id="NF-5">□ 核心概念是否已加粗？</item>
+        <item id="NF-6">□ 是否删除了来源标注？</item>
+      </items>
+    </Check>
+    
+    <!-- 6. 答案处理检查 -->
+    <Check id="POST-6" name="答案处理检查" priority="medium" applies_to="处理学生回答后">
+      <why>确保学生回答被正确处理</why>
+      <items>
+        <item>□ 是否补充了跳跃？</item>
+        <item>□ 是否纠正了错误？</item>
+        <item>□ 是否用学生的声音重新组织？</item>
+        <item>□ 是否解释了这如何支撑钩子问题？</item>
+      </items>
+    </Check>
+  </PostHook>
 
-    <!-- 4. 机制完整性检查 (Rule #8 extension) -->
-    <CheckItem id="mechanism-completeness" name="机制完整性" rule="Rule #8 extension" applies_to="机制/实现类知识">
-      <question>维护了什么数据结构？</question>
-      <question>执行了什么操作？</question>
-      <question>边界情况如何处理？（失败、添加、移除）</question>
-      <question>状态转换：系统如何从状态A转到状态B？（完整循环）</question>
-    </CheckItem>
-
-    <!-- 5. 概念边界检查 -->
-    <CheckItem id="concept-boundary" name="概念边界检查">
-      <question>是否引入了未定义的新术语/概念？</question>
-      <question>每个概念是否在首次使用前定义？</question>
-      <question>如果引用外部概念：它们是否在学生的知识库中？</question>
-      <rule>先定义，再使用（无专家盲点）</rule>
-    </CheckItem>
-
-    <!-- 6. 数据验证 (Rule #26, #27) -->
-    <CheckItem id="data-verification" name="数据验证" rule="Rule #26, #27">
-      <Workflow trigger="使用任何数值数据之前">
-        <step order="1">检查 reusable-knowledge.json → verified_data</step>
-        <step order="2" if="found">直接使用</step>
-        <step order="3" if="not_found">
-          <action>使用网络搜索从权威来源验证</action>
-          <acceptable_sources>官方文档、学术论文、技术书籍、官方基准测试</acceptable_sources>
-          <after_verification>添加到 verified_data，包含来源和日期</after_verification>
-        </step>
-        <step order="4" if="cannot_verify">
-          <option>使用定性描述（如"毫秒级"而非"10ms"）</option>
-          <option>使用相对比较（如"比X快10-100倍"）</option>
-          <tell_student>具体数值需要根据实际场景测试</tell_student>
-        </step>
-      </Workflow>
-      
-      <DataTypesRequiringVerification>
-        <type>性能数据（吞吐量、延迟等）</type>
-        <type>阈值（何时触发、何时切换）</type>
-        <type>公式（复杂度、收敛性等）</type>
-        <type>容量限制（连接数、队列长度等）</type>
-      </DataTypesRequiringVerification>
-    </CheckItem>
-
-    <!-- 7. 来源验证 -->
-    <CheckItem id="source-verification" name="来源验证">
-      <question>这个知识是否来自权威来源？</question>
-      <action if="uncertain">停止教学，先搜索</action>
-      <action if="cannot_find_sources">告诉学生"这是基于一般理解，未经验证"</action>
-    </CheckItem>
-
-    <!-- 8. 可复用知识 (Rule #24, #25) -->
-    <CheckItem id="reusable-knowledge" name="可复用知识" rule="Rule #24, #25">
-      <action>检查 reusable-knowledge.json 中已学习的维度</action>
-      <handling type="reused_dimensions">直接应用，不重复介绍</handling>
-      <handling type="new_dimensions">介绍定义、重要性、影响因素</handling>
-    </CheckItem>
-
-  </Checklist>
-
-  <!-- ==================== 教案编写检查 ==================== -->
-  <Checklist id="teaching-plan-writing" name="教案编写检查" priority="critical">
-    <instruction>编写教案后，必须逐项检查以下清单，确认全部通过后才能输出。不可跳过任何检查项。</instruction>
-
-    <!-- 1. 结构vs内容检查 -->
-    <CheckItem id="structure-vs-content" name="结构vs内容" priority="most-critical">
-      <principle>教案 = 结构框架，不是内容填充</principle>
-      <question>structure字段是否只包含组织指导，不包含具体知识点名称？</question>
-      
-      <BadExample>
-        <code>"内容": ["TLS传输层加密", "端到端加密", "消息签名"]</code>
-        <reason>这是具体知识点，属于内容</reason>
-      </BadExample>
-      
-      <GoodExample>
-        <code>"内部组织": "递进关系", "递进依据": "按信任边界扩展：信任中间件→不信任中间件"</code>
-        <reason>这是组织方式，属于结构</reason>
-      </GoodExample>
-      
-      <ForbiddenInStructure>
-        <item>具体技术名称（如TLS、JWT、RBAC）</item>
-        <item>具体定义文本</item>
-        <item>具体示例和数据</item>
-        <item>完整的工作流程描述</item>
-      </ForbiddenInStructure>
-      
-      <AllowedInStructure>
-        <item>逻辑关系类型（递进/演进/因果/对比/时序）</item>
-        <item>排序依据说明</item>
-        <item>子结构要求（需要包含哪些字段）</item>
-        <item>闭环要求（输入→处理→输出→异常）</item>
-      </AllowedInStructure>
-    </CheckItem>
-
-    <!-- 2. 组织细化检查 -->
-    <CheckItem id="organization-detail" name="组织细化" priority="critical">
-      <question>每个section是否包含以下三要素？</question>
-      
-      <RequiredElements>
-        <element name="逻辑关系类型">递进/演进/因果/对比/时序/分类</element>
-        <element name="排序依据">如果是分类或递进，依据是什么</element>
-        <element name="子结构要求">每个子项需要包含哪些字段</element>
-      </RequiredElements>
-      
-      <BadExample>
-        <code>"section_1": {"说明": "讲解两个防窃听方案"}</code>
-        <reason>缺少逻辑关系、排序依据、子结构要求</reason>
-      </BadExample>
-      
-      <GoodExample>
-        <code>
-"section_1_防窃听": {
-  "内部组织": "递进关系",
-  "递进依据": "按信任边界扩展：信任中间件→不信任中间件",
-  "每个子方案需要包含": {
-    "机制": "保护的是什么",
-    "效果": "解决什么威胁",
-    "代价": "有什么限制",
-    "缓解": "如何降低代价",
-    "场景": "什么时候用"
-  },
-  "递进链条要求": "方案A的局限 → 方案B如何解决"
-}
-        </code>
-        <reason>包含了逻辑关系、排序依据、子结构要求、链条要求</reason>
-      </GoodExample>
-    </CheckItem>
-
-    <!-- 3. 闭环要求检查 -->
-    <CheckItem id="closed-loop" name="闭环要求">
-      <question>机制类内容是否明确要求完整闭环？</question>
-      
-      <ClosedLoopStructure>
-        <step>输入：什么触发这个机制</step>
-        <step>处理：具体步骤是什么</step>
-        <step>输出：产生什么结果</step>
-        <step>异常/验证：边界情况或验证方式</step>
-      </ClosedLoopStructure>
-      
-      <BadExample>
-        <code>"闭环要求": "需要讲清楚机制"</code>
-        <reason>太模糊，没有具体要求</reason>
-      </BadExample>
-      
-      <GoodExample>
-        <code>
-"闭环要求": {
-  "输入": "什么触发签名过程",
-  "处理": "签名的具体步骤（发布者侧）",
-  "输出": "产生什么（消息+签名）",
-  "验证": "订阅者如何验证（验证步骤+失败处理）"
-}
-        </code>
-        <reason>明确了每个闭环步骤需要回答的问题</reason>
-      </GoodExample>
-    </CheckItem>
-
-    <!-- 4. 链条要求检查 -->
-    <CheckItem id="chain-requirement" name="链条要求">
-      <question>递进/演进关系是否明确要求说明"前一个的问题→后一个如何解决"？</question>
-      
-      <BadExample>
-        <code>"递进关系": "按安全强度递进"</code>
-        <reason>只说了递进，没有要求说明递进原因</reason>
-      </BadExample>
-      
-      <GoodExample>
-        <code>
-"递进关系": "按安全强度递进",
-"递进链条要求": "方案A的安全漏洞 → 方案B如何弥补 → 方案B的新问题 → 方案C如何解决"
-        </code>
-        <reason>明确要求说明每个递进的原因</reason>
-      </GoodExample>
-    </CheckItem>
-
-    <!-- 5. 决策结构检查 -->
-    <CheckItem id="decision-structure" name="决策结构">
-      <question>涉及场景选择的内容是否使用"条件→选择→理由"结构？</question>
-      
-      <BadExample>
-        <code>"组合策略": "讲解常规场景和高安全场景的选择"</code>
-        <reason>没有明确决策结构</reason>
-      </BadExample>
-      
-      <GoodExample>
-        <code>
-"组合策略": {
-  "内部组织": "决策关系",
-  "决策结构": "条件（什么场景）→ 选择（用什么方案）→ 理由（为什么）",
-  "需要覆盖的场景": ["常规场景", "高安全场景"],
-  "每个场景需要回答": "信任边界在哪 → 选择什么组合 → 为什么这个组合足够/必要"
-}
-        </code>
-        <reason>明确了决策结构和每个场景需要回答的问题</reason>
-      </GoodExample>
-    </CheckItem>
-
-    <!-- 6. 验证问题设计检查 -->
-    <CheckItem id="verification-design" name="验证问题设计">
-      <question>answer_form_check是否明确避免并列答案？</question>
-      
-      <BadExample>
-        <code>"L1_direction": "三种方案分别是什么"</code>
-        <reason>会导致并列答案</reason>
-      </BadExample>
-      
-      <GoodExample>
-        <code>
-"L1_direction": "机制的保护对象和作用范围",
-"L2_direction": "为什么某机制有某代价（因果链）",
-"answer_form_check": "避免'两种方案分别是什么'，使用'为什么常规场景选择X而不是Y'"
-        </code>
-        <reason>L2使用因果关系，避免并列</reason>
-      </GoodExample>
-    </CheckItem>
-
-    <!-- 最终自检 -->
-    <FinalSelfCheck>
-      <instruction>输出教案前，逐项确认：</instruction>
-      <check>□ structure字段不包含具体技术名称或知识点</check>
-      <check>□ 每个section都有：逻辑关系 + 排序依据 + 子结构要求</check>
-      <check>□ 机制类内容有完整的闭环要求（输入→处理→输出→异常）</check>
-      <check>□ 递进/演进关系有链条要求（前一个的问题→后一个如何解决）</check>
-      <check>□ 场景选择有决策结构（条件→选择→理由）</check>
-      <check>□ 验证问题避免并列答案</check>
-    </FinalSelfCheck>
-
-  </Checklist>
-
-  <!-- ==================== 记录前检查 ==================== -->
-  <Checklist id="before-recording" name="记录前检查">
-
-    <!-- 1. 答案处理 (Rule #7) -->
-    <CheckItem id="answer-processing" name="答案处理" rule="Rule #7">
-      <question>是否补充了跳跃？</question>
-      <question>是否纠正了错误？</question>
-      <question>是否用学生的声音重新组织？</question>
-    </CheckItem>
-
-    <!-- 2. 桥接解释 (Rule #18) -->
-    <CheckItem id="bridging-explanation" name="桥接解释" rule="Rule #18">
-      <question>是否解释了这如何支撑钩子问题？</question>
-      <note>不要问学生（这是教师的工作）</note>
-    </CheckItem>
-
-    <!-- 3. 过渡准备 (Rule #21) -->
-    <CheckItem id="transition-preparation" name="过渡准备" rule="Rule #21">
-      <question>是否识别了与下一个知识的逻辑关系？</question>
-      <question>是否准备了2-3个过渡选项？</question>
-    </CheckItem>
-
-    <!-- 4. 格式检查 -->
-    <CheckItem id="format-check" name="格式检查">
-      <question>是否使用 fsAppend（而非覆盖）？</question>
-      <question>缩进是否正确（- + Tab）？</question>
-      <question>任何层级是否有并列？</question>
-    </CheckItem>
-
-  </Checklist>
+  <!-- 更新记录 -->
+  <UpdateHistory>
+    <Update date="2026-01-07" version="3.0">从Markdown转换为XML格式</Update>
+    <Update date="2026-01-08" version="4.0">按三阶段护栏重构：Pre-hook → In-process → Post-hook</Update>
+  </UpdateHistory>
 
 </Checklists>

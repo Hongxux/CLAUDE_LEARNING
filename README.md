@@ -10,324 +10,126 @@ This system is designed to enable AI to **continuously improve its teaching meth
 
 ---
 
-## Core Design Principles
-
-### 1. Unified Rule System
-
-**Problem**: Scattered rules across multiple files make it hard to maintain consistency.
-
-**Solution**: Single source of truth with layered structure.
-
-#### Architecture (Updated 2026-01-07)
+## Core Architecture (Updated 2026-01-08)
 
 ```
-CLAUDE.xml (Core config, XML format)
-    ├─ Role (tutor definition)
-    ├─ FileRegistry (session start / on-demand / never read)
-    ├─ CriticalRules (absolute prohibitions)
-    ├─ EssentialRules (numbered rules by category)
-    ├─ QuickReference (knowledge depth, verification levels, logical relationships)
-    ├─ SessionProtocol (start/during/end)
-    ├─ TeachingWorkflow (support knowledge / hook question completion)
-    └─ Protocols (reflection / review / atomic card extraction)
+CLAUDE.xml (Core config)
+    ├─ CoreGoal (mission + success criteria)
+    ├─ AbsoluteBoundaries (P0 rules - never violate)
+    │   └─ P0-2: File classification (student notes vs system files)
+    ├─ TeachingFlow (5 phases)
+    │   ├─ Phase 1: 理解 (intent confirmation)
+    │   ├─ Phase 2: 准备教案 (teaching plan + review)  ← NEW
+    │   ├─ Phase 3: 生成 (content generation)
+    │   ├─ Phase 4: 验证 (L1-L4 verification)
+    │   └─ Phase 5: 记录 (note recording)
+    ├─ QualityStandards (3 layers)
+    │   ├─ ContentLayer (四要素, specificity, boundary)
+    │   ├─ StructureLayer (logical relationships, terminology)
+    │   └─ CredibilityLayer (confidence, data verification)
+    ├─ CheckMechanisms (4 stages)
+    │   ├─ ProgressiveCheck (边写边查)
+    │   ├─ SelfQuestioning (自我质疑)
+    │   ├─ ViolationPatternMatching (VP-1 to VP-7)
+    │   └─ FinalCheck (最终自检)
+    └─ Resources (file registry)
 
 TEACHING-MANUAL.xml (Knowledge types + Teaching methods)
-    ├─ KnowledgeTypes (9 types with core/extended fields)
-    ├─ TeachingMethods (value expression, design checks)
-    ├─ TeachingExperience (common problems, lessons)
-    ├─ VerificationQuestionGuide (4 strategies)
-    ├─ TeachingPlanGuide (structure, workflow)
-    └─ ReusableKnowledgeExtraction (dimensions, principles, patterns)
+    ├─ KnowledgeClassification (9 types)
+    ├─ VerificationQuestionGuide (L1-L4)  ← L4 NEW
+    ├─ PrerequisiteCheck (前置知识 + 术语边界)  ← NEW
+    ├─ TeachingPlanGuide
+    │   └─ LogicalRelationshipGuide  ← ENHANCED
+    │       ├─ 递进 (PRO-1 to PRO-6)
+    │       ├─ 因果 (CAU-1 to CAU-3)
+    │       ├─ 对比/分类/时序/演进
+    │       └─ RequiredInStructure
+    └─ LessonsLearned
 
 progress/config/
-    ├─ checklists.xml (pre-teaching / pre-recording checks)
+    ├─ checklists.xml (Pre-hook → In-process → Post-hook)
+    ├─ thinking-chains.xml (10-step teaching plan chain)  ← ENHANCED
     └─ note-format.xml (note writing guidelines)
-
-progress/
-    ├─ learning-state.json (current progress)
-    ├─ review-schedule.json (spaced repetition)
-    └─ curriculum.json (hook questions structure)
 ```
-
-**Key Change (2026-01-07)**: Converted all config files from Markdown to XML format for better AI parsing and clearer structure.
-
-#### Optimization Techniques
-
-| Technique | Description | Benefit |
-|-----------|-------------|---------|
-| **Layered Structure** | Critical rules → Workflow → Details → Reference | Quick access to essentials |
-| **Numbered Rules** | 23 rules organized by category | Easy to reference and discuss |
-| **Concise History** | 1-2 lines per evolution entry | Track changes without bloat |
-| **Recursive Principles** | Apply rules at all levels (e.g., no parallel) | Consistent quality |
-
-**Result**: Clear, maintainable, and continuously improving teaching system
 
 ---
 
-### 2. AI Self-Upgrade Mechanism
+## Key Updates (2026-01-08)
 
-**Problem**: AI cannot improve its teaching methods without structured feedback loop.
+### 1. Teaching Plan Review Phase
 
-**Solution**: Built-in reflection with immediate rule updates.
+**Before**: AI directly starts teaching new content
 
-#### Reflection Loop (Updated 2026-01-05)
-
-```
-Execute teaching
-    ↓
-Student struggles or provides feedback
-    ↓
-AI: State what to reflect
-    ↓
-AI: Share reflection result + improvement proposal
-    ↓
-Discuss with student (critical: user validates)
-    ↓
-Student confirms or corrects
-    ↓
-Update Correctness Rule immediately
-    ↓
-Record to Rule Evolution History (1-2 lines, English)
-    ↓
-Pre-check rules before next teaching (Rule #23)
-    ↓
-Apply improvement automatically
-```
-
-#### Key Improvements This Session (2026-01-05)
-
-1. **Reflection Discussion Before Recording** (Rule #19)
-   - AI must discuss reflection with student before recording
-   - Ensures accuracy and agreement
-
-2. **Prohibit Parallel Listing** (Rule #22 - Most Critical)
-   - Eliminate parallel relationships at ALL levels (recursive)
-   - Identify logical relationships: Progressive/Causal/Hierarchical/Temporal/etc.
-   - Example: 总 → 分1 (mechanism) → 分2 (result) is causal chain, not parallel
-
-3. **Reflection Enforcement Through Pre-Checks** (Rule #23)
-   - Before teaching/recording, internally check all rules
-   - Silent quality control ensures reflections actually take effect
-
-4. **Verification Answer Processing** (Rule #7)
-   - Process every answer: supplement jumps → correct errors → add omissions
-   - Reorganize simulating student's thinking
-   - Notes reflect student's corrected voice, not just teaching content
-
-5. **Student-Initiated Questions** (Rule #17)
-   - After answering, ask: "这个解答值得补充到笔记中吗？"
-   - Mark for recording if student confirms
-
-6. **Bridging Explanation** (Rule #18)
-   - Teacher provides bridging (how support knowledge helps answer hook question)
-   - Not a verification question for student
-
-7. **Immediate Recording** (Rule #20)
-   - Record to notes immediately after each support knowledge
-   - Use `fsAppend` to minimize data loss risk
-
-8. **Transition Between Knowledge** (Rule #21)
-   - Provide 2-3 logical relationship options
-   - Student selects → Add transition sentence to notes
-
----
-
-### 3. Sustainable Improvement System
-
-**Problem**: Systems degrade over time without maintenance mechanisms.
-
-**Solution**: Layered architecture with clear responsibilities and continuous refinement.
-
-#### Layered Architecture (Updated 2026-01-05)
+**Now**: AI must generate teaching plan → show to student → get approval → then teach
 
 ```
-Layer 1: Critical Rules (CLAUDE.md top section)
-    ├─ 3 absolute prohibitions
-    ├─ Session start trigger
-    └─ Most important: Rule #22 (no parallel, recursive)
-
-Layer 2: Core Workflow (CLAUDE.md)
-    ├─ Support Knowledge Teaching (complete flow)
-    ├─ Hook Question Completion
-    └─ Pre-checks before teaching (Rule #23)
-
-Layer 3: Essential Rules (CLAUDE.md)
-    ├─ 23 numbered rules by category
-    ├─ Recording & Progress
-    ├─ Verification & Answer Processing
-    ├─ Teaching Quality
-    ├─ Reflection & Improvement
-    └─ Transitions & Structure
-
-Layer 4: Quick Reference (CLAUDE.md)
-    ├─ Knowledge depth (Core/Support/Extension)
-    ├─ Verification levels (L1-L5)
-    ├─ Logical relationships (6 explicit + 7 hidden)
-    └─ Classification dimensions (10 types)
-
-Layer 5: Rule Evolution History (CLAUDE.md)
-    ├─ Tracks why rules changed
-    ├─ 1-2 lines per entry
-    └─ English only for efficiency
-
-Layer 6: Learning State (progress/)
-    ├─ learning-state.json (current progress)
-    ├─ review-schedule.json (spaced repetition)
-    └─ curriculum.json (hook questions)
+学习新钩子问题
+    ↓
+检查教案是否存在
+    ↓
+生成教案（按思维链）
+    ↓
+展示教案给学生审核  ← 必须！
+    ↓
+学生确认或修改
+    ↓
+保存教案
+    ↓
+开始教学
 ```
 
-#### Continuous Refinement Mechanisms
+### 2. Prerequisite Check & Terminology Boundary
 
-**When**: During and after each session
+**Before**: Assume student has all prerequisite knowledge
 
-**What**:
-1. **Immediate Rule Updates**: When student provides feedback, update rule immediately (Rule #15)
-2. **Pre-Check Enforcement**: Before teaching, check all rules internally (Rule #23)
-3. **Concise History**: Record rule changes in 1-2 lines (Rule Evolution History)
-4. **Recursive Application**: Apply principles at all levels (e.g., Rule #22 no parallel)
+**Now**: Before teaching, check prerequisites and define ambiguous terms
 
-**Why**: Ensures system improves continuously without bloat
-
----
-
-### 4. User Participation Mechanism
-
-**Problem**: AI's understanding may be biased or incorrect.
-
-**Solution**: Require user validation before recording improvements.
-
-#### Participation Flow
-
-```
-AI detects problem
-    ↓
-AI: "I noticed problem X. I think root cause is Y. I propose improvement Z. What do you think?"
-    ↓
-User: "Root cause is not Y, it's Y'. Improvement should be Z'."
-    ↓
-AI: "Understood. Let me update my understanding."
-    ↓
-AI records reflection (based on user's correction)
+```xml
+<术语约定>
+- 「一致性」指的是：CAP中的C（数据副本一致性），不包括ACID中的一致性
+- 「可用性」指的是：CAP中的A（系统能响应），不是SLA可用性百分比
+</术语约定>
 ```
 
-#### Why Critical
+### 3. Logical Relationship Dimensions
 
-- AI's analysis may miss context
-- User feedback is ground truth
-- User participation ensures system aligns with actual needs
-- Creates collaborative improvement loop
+**Before**: Just say "递进关系"
 
----
+**Now**: Must specify dimension, ordering basis, and chain requirement
 
-### 5. Portable Architecture
+| Relation | Dimensions | Example |
+|----------|------------|---------|
+| 递进 | PRO-1 能力递进, PRO-2 范围递进, PRO-3 信任边界递进, PRO-4 抽象层次递进, PRO-5 保障强度递进, PRO-6 解耦程度递进 | PRO-3: 传输层加密→端到端加密 |
+| 因果 | CAU-1 问题-原因, CAU-2 原因-结果, CAU-3 设计-效果 | CAU-1: 现象→直接原因→根本原因 |
+| 对比 | 对比维度 + 统一框架 + 选择标准 | 每个方案用相同结构描述 |
+| 分类 | 分类维度 + 依据 + 排序 + MECE | 按功能/实现/场景/复杂度 |
 
-**Problem**: Hard to migrate system to new contexts.
+### 4. L4 Application Questions
 
-**Solution**: Configuration-driven design with clear documentation.
+**Before**: L1-L3 verification (事实性/因果性/权衡性)
 
-#### Portability Features
+**Now**: Add L4 application questions for knowledge transfer
 
-| Feature | Description | Benefit |
-|---------|-------------|---------|
-| **Config-Logic Separation** | Teaching methods in JSON, not hardcoded | Easy to adapt |
-| **Documented Principles** | CLAUDE.md explains "why", not just "what" | Understandable |
-| **Structured Data** | JSON format, not free text | Machine-readable |
-| **Clear Responsibilities** | Each file has single purpose | Easy to modify |
+| Level | Type | Example |
+|-------|------|---------|
+| L4 | 场景决策 | 给定场景X，你会选择什么方案？为什么？ |
+| L4 | 问题诊断 | 系统出现X现象，可能是什么原因？如何排查？ |
+| L4 | 方案设计 | 如果要实现X目标，你会如何设计？ |
+| L4 | 边界判断 | 这个方案在什么情况下会失效？ |
 
-#### Migration Steps
+### 5. Enhanced File Protection (P0-2)
 
-1. Copy `CLAUDE.md` (core principles)
-2. Copy `teaching-reflections.json` (methods + accumulated experience)
-3. Adapt `quick_reference` to new context
-4. Update student background in CLAUDE.md
-5. Test with sample session
-6. Adjust based on feedback
+**Before**: Simple rule "don't read student notes"
 
----
+**Now**: Detailed file classification with pre-read check
 
-## Key Innovations
-
-### 1. Recursive No-Parallel Principle (Rule #22 - Most Critical)
-
-**Traditional**: List multiple items in parallel (hard to remember)
-
-**This System**: 
-- Identify logical relationships at ALL levels (recursive)
-- Use: Progressive/Causal/Categorical/Hierarchical/Temporal/Contrastive
-- Example: 总 → 分1 (mechanism) → 分2 (result) is causal chain
-- Even within "分" items, continue identifying relationships
-
-**Impact**: Every piece of knowledge has clear logical structure, dramatically improves memorability
-
-### 2. Reflection Enforcement Through Pre-Checks (Rule #23)
-
-**Traditional**: Record reflections but forget to apply them
-
-**This System**: 
-- Before teaching/recording, internally check all rules
-- Adjust content if violations found
-- Silent quality control
-
-**Impact**: Reflections actually take effect, system continuously improves
-
-### 3. Progressive Verification with Answer Processing (Rule #7)
-
-**Traditional**: Teach all → Ask questions → Student struggles
-
-**This System**: 
-- Teach one → Verify immediately (L1-L3, 5 questions)
-- Process each answer: supplement jumps → correct errors → add omissions
-- Reorganize simulating student's thinking
-- Record student's corrected voice to notes
-
-**Impact**: Prevents knowledge gaps, notes reflect authentic understanding
-
-### 4. Layered Explanation with Concrete Examples (Rule #8)
-
-**Traditional**: Same depth for all knowledge
-
-**This System**: 
-- Core knowledge: 8 parts, L1-L5 verification, deep
-- Support knowledge: 5 parts, L1-L3 verification, sufficient only
-- Extension knowledge: 2 parts, L1 verification, minimal
-- Key concepts: name + concrete numerical examples
-
-**Impact**: Student knows what's important, no information overload, abstract concepts become concrete
-
-### 5. Bridging and Transitions (Rules #18, #21)
-
-**Traditional**: Teach isolated knowledge points
-
-**This System**:
-- After verification, teacher provides bridging explanation (how this helps answer hook question)
-- Before next knowledge, identify logical relationship (provide 2-3 options)
-- Student selects → Add transition sentence to notes
-
-**Impact**: Knowledge forms coherent structure, not isolated facts
-
-### 6. Immediate Recording (Rule #20)
-
-**Traditional**: Record at end of session (risk of data loss)
-
-**This System**: Record immediately after each support knowledge using `fsAppend`
-
-**Impact**: Minimizes data loss, enables flexible pause points
-
-### 7. Student-Initiated Questions (Rule #17)
-
-**Traditional**: Answer question → Continue
-
-**This System**: Answer → Ask "这个解答值得补充到笔记中吗？" → Mark for recording
-
-**Impact**: Captures authentic learning moments, student curiosity drives content
-
-### 8. Reflection Discussion Before Recording (Rule #19)
-
-**Traditional**: AI decides what to reflect and records directly
-
-**This System**: State what to reflect → Share result → Discuss → Get confirmation → Record
-
-**Impact**: Ensures reflection accuracy and student agreement
+```
+读取文件前必须检查：
+1. 这个文件是否在根目录？
+2. 这个文件名是否是中文？
+3. 这个文件扩展名是否是 .md？
+→ 如果三个都是"是"，则绝对禁止读取
+```
 
 ---
 
@@ -335,355 +137,93 @@ AI records reflection (based on user's correction)
 
 ```
 project/
-├── CLAUDE.xml                          # Core tutor config (XML format)
-├── TEACHING-MANUAL.xml                 # Knowledge types + Teaching methods (XML)
-├── README.md                           # This file (system design documentation)
+├── CLAUDE.xml                          # Core tutor config
+├── TEACHING-MANUAL.xml                 # Knowledge types + Teaching methods
+├── README.md                           # This file
 ├── progress/
 │   ├── config/
-│   │   ├── checklists.xml              # Pre-teaching/recording checks (XML)
-│   │   └── note-format.xml             # Note writing guidelines (XML)
+│   │   ├── checklists.xml              # Three-phase guardrails
+│   │   ├── thinking-chains.xml         # 10-step teaching plan chain
+│   │   └── note-format.xml             # Note writing guidelines
 │   ├── learning-state.json             # Current progress
-│   ├── review-schedule.json            # Spaced repetition schedule
-│   ├── curriculum.json                 # Hook questions structure
-│   ├── reusable-knowledge.json         # Reusable dimensions/principles/patterns
+│   ├── review-schedule.json            # Spaced repetition
+│   ├── curriculum.json                 # Hook questions (钩子问题来源)
+│   ├── reusable-knowledge.json         # Reusable dimensions/patterns
 │   ├── active/
 │   │   ├── concepts/                   # Active concept definitions
 │   │   └── teaching-plans/             # Active teaching plans
 │   └── archive/                        # Completed documents
-│       └── [completed].json
-├── 发布-订阅架构风格.md                  # Learning document (Chinese, student-facing)
+├── 发布-订阅架构风格.md                  # Student notes (禁止AI读取)
+├── 第二章的钩子问题.md                   # Student notes (禁止AI读取)
 └── sessions/
     └── 2026-01-XX/
-        └── [session-notes].md          # Session-specific notes
+        └── [session-notes].md          # Session work records
 ```
 
 ---
 
-## Token Usage Breakdown (Updated 2026-01-07)
+## Teaching Plan Chain (10 Steps)
 
-| Component | Format | Frequency | Notes |
-|-----------|--------|-----------|-------|
-| CLAUDE.xml | XML | Every session | Core tutor config |
-| TEACHING-MANUAL.xml | XML | Creating plans | Knowledge types + methods |
-| checklists.xml | XML | Before teaching | Pre-check lists |
-| note-format.xml | XML | Before recording | Note guidelines |
-| learning-state.json | JSON | Every session | Current progress |
-| review-schedule.json | JSON | Every session | Spaced repetition |
-| curriculum.json | JSON | Every session | Hook questions |
-| concepts (on-demand) | JSON | When teaching | Load only when needed |
-
-**Key**: XML format provides clearer structure for AI parsing
-
----
-
-## Lessons Learned (Updated 2026-01-05)
-
-### 1. Teaching Structure
-
-- **Eliminate parallel at all levels**: Recursive application of no-parallel principle (Rule #22)
-- **Identify logical relationships**: Progressive/Causal/Hierarchical/Temporal/Categorical/Contrastive
-- **Concrete examples essential**: Abstract concepts need "name + numerical example" (Rule #8)
-- **Process verification answers**: Supplement jumps, correct errors, reorganize (Rule #7)
-
-### 2. AI Self-Improvement
-
-- **Discuss before recording**: AI must validate understanding with student (Rule #19)
-- **Pre-check enforcement**: Check rules before teaching, not just record them (Rule #23)
-- **Immediate rule updates**: When student provides feedback, update immediately (Rule #15)
-- **Concise history**: 1-2 lines per evolution entry prevents bloat
-
-### 3. System Design
-
-- **Unified source of truth**: Single CLAUDE.md better than scattered files
-- **Layered architecture**: Critical → Workflow → Rules → Reference → History
-- **Numbered rules**: Easy to reference in discussions (e.g., "Rule #22")
-- **Clear responsibilities**: Each section has one purpose
-
-### 4. User Experience
-
-- **Bridging explanations**: Teacher explains connections, not ask student (Rule #18)
-- **Transition options**: Provide 2-3 relationship options, student selects (Rule #21)
-- **Immediate recording**: After each support knowledge, not at end (Rule #20)
-- **Student-initiated questions**: Ask if worth recording, capture curiosity (Rule #17)
-
-### 5. Note Quality
-
-- **Student's corrected voice**: Notes reflect student's understanding after processing
-- **Logical structure**: Every knowledge point has clear relationship with others
-- **Obsidian format**: Use indentation, not headers; no tables
-- **Objective statements**: Notes are knowledge, not conversation
+```
+Step 1: 识别知识类型
+    ↓
+Step 2: 识别前置知识  ← NEW
+    ↓
+Step 3: 定义术语边界  ← NEW
+    ↓
+Step 4: 确定核心字段
+    ↓
+Step 5: 设计structure字段  ← ENHANCED (逻辑关系维度)
+    ↓
+Step 6: 设计验证问题  ← ENHANCED (L1-L4)
+    ↓
+Step 7: 设计桥接和过渡
+    ↓
+Step 8: 识别风险点
+    ↓
+Step 9: 最终自检
+    ↓
+Step 10: 反向验证
+```
 
 ---
 
-## Future Improvements
+## Three-Phase Guardrails
 
-Potential areas for enhancement:
-
-1. **Adaptive Difficulty**: Adjust explanation depth based on student's demonstrated understanding level
-2. **Pattern Recognition**: Identify common logical relationships across different topics
-3. **Automated Relationship Detection**: Use LLM to suggest logical relationships between knowledge points
-4. **Performance Metrics**: Track student progress, review effectiveness, rule application frequency
-5. **Multi-Domain Adaptation**: Test system with different subjects (frontend, ML, databases, etc.)
-6. **Collaborative Learning**: Share effective teaching patterns across multiple students
+| Phase | Trigger | Key Checks |
+|-------|---------|------------|
+| Pre-hook | 教学前 | 意图确认, 知识边界声明, 数据验证, 前置知识 |
+| In-process | 教学中 | 内容组织(禁止并列), 内容密度(四要素), 机制闭环, 边界完整 |
+| Post-hook | 教学后 | P0规则, 违规模式匹配(VP-1~7), 自我质疑, 笔记格式 |
 
 ---
 
-## Getting Started
-
-To use this system:
-
-1. Read `CLAUDE.xml` to understand the core tutor configuration
-2. Review `TEACHING-MANUAL.xml` for knowledge types and teaching methods
-3. Start a learning session with "继续学习"
-4. Provide feedback when teaching isn't working (use "复述理解，分享疑问")
-5. Watch the system improve through your feedback
-
-**Key Commands**:
-- `继续学习`: Continue from current progress
-- `复习`: Review previously learned content
-- `复述理解，分享疑问`: Request AI to clarify understanding before proceeding
-
----
-
-## How to Use This Project
-
-### Quick Start (5 minutes)
+## Quick Start
 
 1. **Clone the project** to your local machine
 2. **Open in IDE** with AI assistant support (e.g., Cursor, Kiro)
-3. **Say "继续学习"** to start learning from where you left off
+3. **Say "继续学习"** to start learning
 
 ### Session Commands
 
 | Command | Description |
 |---------|-------------|
 | `继续学习` | Continue learning from current progress |
-| `复习` | Review previously learned content (spaced repetition) |
+| `复习` | Review previously learned content |
 | `我有疑问：[问题]` | Ask a question about current topic |
-| `复述理解，分享疑问` | Request AI to restate understanding and share doubts (for clarification) |
-
-### Learning Flow
-
-```
-Start session
-    ↓
-AI reads progress files
-    ↓
-AI determines today's content (new learning or review)
-    ↓
-AI teaches hook question (decomposed into sub-questions)
-    ↓
-AI verifies your understanding (L1-L3 questions)
-    ↓
-You answer → AI finds gaps → AI supplements
-    ↓
-AI records to learning document
-    ↓
-Next hook question or end session
-```
-
-### File Outputs
-
-After learning sessions, you'll have:
-- **Learning document** (e.g., `发布-订阅架构风格.md`): Your notes in Obsidian format
-- **Progress tracking** (`progress/learning-state.json`): Current learning state
-- **Review schedule** (`progress/review-schedule.json`): Spaced repetition reminders
-- **Archived knowledge** (`progress/archive/`): Completed documents
 
 ---
 
-## How to Customize for Your Own Learning
+## Version History
 
-### Step 1: Modify Student Background (CLAUDE.xml)
-
-Edit the `Role` section in `CLAUDE.xml` to match your background:
-
-```xml
-<Role>
-  <description>Interactive tutor for [YOUR ROLE] with [YOUR BACKGROUND] but [YOUR GAPS].</description>
-</Role>
-```
-
-**Example**:
-```xml
-<Role>
-  <description>Interactive tutor for frontend developer with React/TypeScript experience but no backend or distributed systems knowledge.</description>
-</Role>
-```
-
-### Step 2: Create Your Learning Document
-
-Create a new `.md` file with your learning content. Follow this structure:
-
-```markdown
-# [Topic Name]
-
-## 钩子问题（待学习）
-### 一、[Category 1]
-1. [Hook question 1]
-2. [Hook question 2]
-
-### 二、[Category 2]
-3. [Hook question 3]
-...
-
----
-
-### 关键概念
-
-#### 1. [Concept Name]：
-1. 定义与核心价值
-    - 定义：...
-    - 概念本质：...
-    - 核心价值：...
-...
-
----
-
-## 学习记录
-
-(AI will fill this section during learning)
-```
-
-**Key Points**:
-- Hook questions should be deep, thought-provoking questions
-- Key concepts should cover the core knowledge you want to learn
-- Use Chinese for content you'll read, English for AI-only content
-
-### Step 3: Update Learning State
-
-Edit `progress/learning-state.json`:
-
-```json
-{
-  "current_document": "your-new-document.md",
-  "hooks_progress": {
-    "钩子问题1_[short_name]": "not_started",
-    "钩子问题2_[short_name]": "not_started"
-  },
-  "concepts_progress": {
-    "[Concept 1]": "not_started",
-    "[Concept 2]": "not_started"
-  },
-  "doubts": [],
-  "last_session": "2026-01-05"
-}
-```
-
-### Step 4: Create Curriculum Structure
-
-Create `progress/curriculum.json`:
-
-```json
-{
-  "documents": {
-    "your-new-document.md": {
-      "completed_hooks": [],
-      "pending_hooks": {
-        "一、[Category 1]": [
-          "1. [Hook question 1]",
-          "2. [Hook question 2]"
-        ]
-      },
-      "concepts_file": "progress/concepts/your-new-document.json"
-    }
-  }
-}
-```
-
-### Step 5: Customize Teaching Methods (Optional)
-
-The teaching system is now in XML format. To customize:
-
-**CLAUDE.xml**: Add domain-specific rules to the EssentialRules section
-
-**TEACHING-MANUAL.xml**: Add domain-specific knowledge types or teaching methods
-
-**note-format.xml**: Modify if using different tool than Obsidian
-
-### Example: Customizing for Kubernetes Learning
-
-**CLAUDE.xml**:
-```xml
-<Role>
-  <description>Interactive tutor for DevOps engineer with Docker experience but no Kubernetes production experience.</description>
-</Role>
-```
-
-**kubernetes-architecture.md**:
-```markdown
-# Kubernetes 架构
-
-## 钩子问题（待学习）
-### 一、核心组件
-1. kube-apiserver 如何实现高可用？
-2. etcd 的一致性机制是什么？
-...
-```
-
-**learning-state.json**:
-```json
-{
-  "current_document": "kubernetes-architecture.md",
-  "hooks_progress": {
-    "钩子问题1_apiserver高可用": "not_started"
-  }
-}
-```
-
----
-
-## Tips for Effective Learning
-
-1. **Be honest about confusion**: When you don't understand, say so. AI will reflect and improve.
-2. **Share your insights**: Your personal understanding is valuable and will be recorded as "个人洞察".
-3. **Use "复述理解，分享疑问"**: This triggers AI to clarify its understanding before proceeding.
-4. **Point out logical issues**: If knowledge seems parallel or unclear, tell AI. It will reorganize.
-5. **Review regularly**: The spaced repetition system works best when you follow the schedule.
-6. **Provide feedback**: When AI's teaching isn't working, tell it. System improves through your feedback.
-7. **Ask questions during verification**: Your questions reveal curiosity and will be recorded if valuable.
-
----
-
-## Contributing
-
-When you discover new improvements:
-
-1. Discuss with AI during session (use "复述理解，分享疑问")
-2. AI will state what to reflect → share result → discuss with you
-3. After confirmation, AI updates Correctness Rule immediately
-4. AI records to Rule Evolution History (1-2 lines)
-5. Improvement applies automatically in next teaching (pre-check)
-6. Consider updating this README if it's a system-level improvement
-
-**Recent Major Improvements** (2026-01-05):
-- Rule #22: Recursive no-parallel principle (most critical)
-- Rule #23: Reflection enforcement through pre-checks
-- Rule #19: Reflection discussion before recording
-- Rule #7: Verification answer processing
-- Rules #17, #18, #20, #21: Student questions, bridging, recording, transitions
+| Date | Version | Changes |
+|------|---------|---------|
+| 2026-01-05 | 2.0 | Consolidated to CLAUDE.md, Rule #22 no-parallel |
+| 2026-01-07 | 3.0 | Converted all configs to XML format |
+| 2026-01-08 | 4.0 | Teaching plan review, L4 questions, prerequisite check, logical relationship dimensions |
 
 ---
 
 ## License
 
 This is a learning project. Feel free to adapt for your own use.
-
----
-
-## Acknowledgments
-
-This system evolved through iterative improvement during actual teaching sessions. Key insights came from:
-
-- Student feedback on parallel listing (hard to remember)
-- Observing where students had logical jumps in answers
-- Experimenting with different logical relationship structures
-- Discovering the need for recursive application of principles
-- Realizing reflections must be enforced through pre-checks
-
-**Major Evolution**:
-- 2026-01-05: Consolidated teaching-reflections.json into CLAUDE.md
-- 2026-01-05: Introduced recursive no-parallel principle (Rule #22)
-- 2026-01-07: Converted all config files from Markdown to XML format for better AI parsing
-
-The system is designed to continue evolving through the same collaborative process.
